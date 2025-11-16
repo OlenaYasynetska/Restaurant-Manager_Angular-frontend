@@ -6,11 +6,20 @@ import { MenuItem, MenuCategory } from '../models/restaurant.models';
   providedIn: 'root'
 })
 export class MenuService {
-  private menuItemsSubject = new BehaviorSubject<MenuItem[]>(this.getMockMenuItems());
+  private readonly STORAGE_KEY = 'restaurant_menu_items';
+  private menuItemsSubject = new BehaviorSubject<MenuItem[]>(this.loadFromLocalStorage());
   public menuItems$ = this.menuItemsSubject.asObservable();
   private nextId = 27; // Следующий ID для новых блюд
 
-  constructor() {}
+  constructor() {
+    // Загружаем данные из localStorage при инициализации
+    const savedItems = this.loadFromLocalStorage();
+    if (savedItems.length > 0) {
+      // Обновляем nextId на основе максимального ID в сохраненных данных
+      const maxId = Math.max(...savedItems.map(item => item.id));
+      this.nextId = maxId + 1;
+    }
+  }
 
   // Получить все позиции меню
   getMenuItems(): Observable<MenuItem[]> {
@@ -41,11 +50,14 @@ export class MenuService {
       available: data.available ?? true,
       preparationTime: data.preparationTime || 15,
       description: data.description || '',
-      image: data.image || '🍽️'
+      image: data.image || '🍽️',
+      imageUrl: data.imageUrl || undefined
     };
 
     const currentItems = this.menuItemsSubject.value;
-    this.menuItemsSubject.next([...currentItems, newItem]);
+    const updatedItems = [...currentItems, newItem];
+    this.menuItemsSubject.next(updatedItems);
+    this.saveToLocalStorage(updatedItems);
     
     return newItem;
   }
@@ -61,7 +73,9 @@ export class MenuService {
         ...data,
         id // Сохраняем оригинальный ID
       };
-      this.menuItemsSubject.next([...currentItems]);
+      const updatedItems = [...currentItems];
+      this.menuItemsSubject.next(updatedItems);
+      this.saveToLocalStorage(updatedItems);
     }
   }
 
@@ -70,6 +84,7 @@ export class MenuService {
     const currentItems = this.menuItemsSubject.value;
     const filteredItems = currentItems.filter(item => item.id !== id);
     this.menuItemsSubject.next(filteredItems);
+    this.saveToLocalStorage(filteredItems);
   }
 
   // Мок данные меню
@@ -117,6 +132,29 @@ export class MenuService {
       { id: 25, name: 'Вино белое (бокал)', category: MenuCategory.ALCOHOL, price: 450, available: true, preparationTime: 2, description: 'Белое сухое вино', image: '🍷' },
       { id: 26, name: 'Пиво разливное', category: MenuCategory.ALCOHOL, price: 280, available: true, preparationTime: 2, description: 'Светлое пиво 0.5л', image: '🍺' },
     ];
+  }
+
+  // Сохранить данные в localStorage
+  private saveToLocalStorage(items: MenuItem[]): void {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items));
+    } catch (error) {
+      console.error('Ошибка при сохранении меню в localStorage:', error);
+    }
+  }
+
+  // Загрузить данные из localStorage
+  private loadFromLocalStorage(): MenuItem[] {
+    try {
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке меню из localStorage:', error);
+    }
+    // Если данных нет или ошибка, возвращаем моковые данные
+    return this.getMockMenuItems();
   }
 }
 

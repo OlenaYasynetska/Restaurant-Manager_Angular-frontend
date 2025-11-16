@@ -82,7 +82,8 @@ export interface MenuItem {
   category: MenuCategory;
   price: number;
   description?: string;
-  image?: string;
+  image?: string;          // эмодзи или иконка
+  imageUrl?: string;       // URL реального фото блюда
   available: boolean;      // доступно для заказа
   preparationTime?: number; // время приготовления в минутах
 }

@@ -26,7 +26,8 @@ export class MenuManagementComponent implements OnInit {
     description: '',
     preparationTime: 15,
     available: true,
-    image: ''
+    image: '',
+    imageUrl: ''
   };
   
   // Категории
@@ -62,7 +63,8 @@ export class MenuManagementComponent implements OnInit {
       description: '',
       preparationTime: 15,
       available: true,
-      image: ''
+      image: '',
+      imageUrl: ''
     };
     this.showModal = true;
   }
@@ -77,7 +79,8 @@ export class MenuManagementComponent implements OnInit {
       description: item.description || '',
       preparationTime: item.preparationTime || 15,
       available: item.available,
-      image: item.image || ''
+      image: item.image || '',
+      imageUrl: item.imageUrl || ''
     };
     this.showModal = true;
   }
@@ -126,6 +129,40 @@ export class MenuManagementComponent implements OnInit {
   // Форматирование цены
   formatPrice(price: number): string {
     return `€${price.toLocaleString('ru-RU')}`;
+  }
+
+  // Обработка загрузки фото
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      
+      // Проверка типа файла
+      if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите файл изображения');
+        return;
+      }
+
+      // Проверка размера (максимум 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Размер файла не должен превышать 5MB');
+        return;
+      }
+
+      // Чтение файла и конвертация в base64
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        if (e.target?.result) {
+          this.formData.imageUrl = e.target.result as string;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Удалить загруженное фото
+  removePhoto(): void {
+    this.formData.imageUrl = '';
   }
 }
 

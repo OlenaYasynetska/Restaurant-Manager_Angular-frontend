@@ -30,17 +30,17 @@ export class TablesComponent implements OnInit {
 
   // Получить CSS класс для столика
   getTableClass(status: TableStatus): string {
-    const baseClasses = 'relative bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer p-6 flex flex-col items-center justify-center min-h-[140px]';
+    const baseClasses = 'relative rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer p-6 flex flex-col items-center justify-center min-h-[140px]';
     
     switch (status) {
       case TableStatus.FREE:
-        return `${baseClasses} border-2 border-green-300 hover:border-green-400`;
+        return `${baseClasses} border-2 border-green-300 hover:border-green-400 bg-green-50`;
       case TableStatus.RESERVED:
-        return `${baseClasses} border-2 border-purple-400 hover:border-purple-500 bg-purple-50`;
+        return `${baseClasses} border-2 border-purple-400 hover:border-purple-500 bg-purple-100`;
       case TableStatus.OCCUPIED:
-        return `${baseClasses} border-2 border-blue-400 hover:border-blue-500 bg-blue-50`;
+        return `${baseClasses} border-2 border-blue-400 hover:border-blue-500 bg-blue-100`;
       case TableStatus.WAITING_PAYMENT:
-        return `${baseClasses} border-2 border-yellow-400 hover:border-yellow-500 bg-yellow-50`;
+        return `${baseClasses} border-2 border-yellow-400 hover:border-yellow-500 bg-yellow-100`;
       case TableStatus.CLOSED:
         return `${baseClasses} border-2 border-gray-300 bg-gray-100 cursor-not-allowed opacity-60`;
       default:

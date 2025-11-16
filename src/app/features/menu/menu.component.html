@@ -46,9 +46,22 @@
       *ngFor="let item of getFilteredMenuItems(menuItems$ | async)"
       class="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
     >
-      <!-- Изображение (заглушка) -->
-      <div class="h-32 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-4xl">
-        🍽️
+      <!-- Изображение -->
+      <div class="h-32 relative overflow-hidden">
+        <!-- Если есть URL фото -->
+        <img 
+          *ngIf="item.imageUrl" 
+          [src]="item.imageUrl" 
+          [alt]="item.name"
+          class="w-full h-full object-cover"
+        />
+        <!-- Иначе показываем иконку по умолчанию -->
+        <div 
+          *ngIf="!item.imageUrl" 
+          class="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center text-5xl"
+        >
+          🍽️
+        </div>
       </div>
       
       <!-- Информация о блюде -->
