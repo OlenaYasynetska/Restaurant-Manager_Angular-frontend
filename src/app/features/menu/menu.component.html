@@ -1,0 +1,160 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Заголовок и поиск -->
+  <div class="mb-6">
+    <button
+      *ngIf="orderId && tableId"
+      (click)="cancel()"
+      class="text-blue-600 hover:text-blue-700 mb-2 flex items-center gap-2"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Назад к заказу
+    </button>
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Меню</h1>
+    
+    <!-- Поиск -->
+    <div class="mb-4">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Поиск блюд..."
+        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+      />
+    </div>
+  </div>
+
+  <!-- Фильтр по категориям -->
+  <div class="mb-6 overflow-x-auto">
+    <div class="flex gap-2 pb-2">
+      <button
+        *ngFor="let category of categories"
+        (click)="selectedCategory = category.value"
+        [class]="'px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ' + 
+          (selectedCategory === category.value 
+            ? 'bg-blue-600 text-white' 
+            : 'bg-white text-gray-700 hover:bg-gray-100')"
+      >
+        {{ category.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Сетка блюд -->
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-24">
+    <div
+      *ngFor="let item of getFilteredMenuItems(menuItems$ | async)"
+      class="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
+    >
+      <!-- Изображение (заглушка) -->
+      <div class="h-32 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-4xl">
+        🍽️
+      </div>
+      
+      <!-- Информация о блюде -->
+      <div class="p-4">
+        <!-- Категория -->
+        <div class="text-xs text-gray-500 mb-1">{{ item.category }}</div>
+        
+        <!-- Название -->
+        <h3 class="font-semibold text-gray-800 mb-2">{{ item.name }}</h3>
+        
+        <!-- Описание (если есть) -->
+        <p *ngIf="item.description" class="text-sm text-gray-600 mb-3 line-clamp-2">
+          {{ item.description }}
+        </p>
+        
+        <!-- Время приготовления -->
+        <div *ngIf="item.preparationTime" class="text-xs text-gray-500 mb-3 flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {{ item.preparationTime }} мин
+        </div>
+        
+        <!-- Цена и кнопки -->
+        <div class="flex items-center justify-between">
+          <div class="text-xl font-bold text-gray-900">
+            {{ formatPrice(item.price) }}
+          </div>
+          
+          <!-- Кнопки добавления/управления количеством (только если есть orderId) -->
+          <div *ngIf="orderId && tableId">
+            <div *ngIf="getCartQuantity(item.id) === 0; else quantityControls">
+              <button
+                (click)="addToCart(item)"
+                [disabled]="!item.available"
+                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg transition font-medium text-sm"
+              >
+                Добавить
+              </button>
+            </div>
+          </div>
+          
+          <ng-template #quantityControls>
+            <div class="flex items-center gap-2 bg-blue-50 rounded-lg px-2 py-1">
+              <button
+                (click)="removeFromCart(item.id)"
+                class="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded transition"
+              >
+                −
+              </button>
+              <span class="w-6 text-center font-semibold text-blue-600">
+                {{ getCartQuantity(item.id) }}
+              </span>
+              <button
+                (click)="addToCart(item)"
+                class="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded transition"
+              >
+                +
+              </button>
+            </div>
+          </ng-template>
+        </div>
+        
+        <!-- Недоступно -->
+        <div *ngIf="!item.available" class="mt-2 text-xs text-red-600">
+          Временно недоступно
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Пустой результат поиска -->
+  <div
+    *ngIf="getFilteredMenuItems(menuItems$ | async).length === 0"
+    class="text-center py-16 text-gray-500"
+  >
+    <div class="text-6xl mb-4">🔍</div>
+    <p class="text-lg">Ничего не найдено</p>
+  </div>
+
+  <!-- Плавающая панель с корзиной - только если есть orderId -->
+  <div
+    *ngIf="orderId && tableId && getTotalCartItems() > 0"
+    class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50"
+  >
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex-1">
+        <div class="text-sm text-gray-600">Выбрано позиций: {{ getTotalCartItems() }}</div>
+        <div class="text-xl font-bold text-gray-900">{{ formatPrice(getCartTotal()) }}</div>
+      </div>
+      
+      <div class="flex gap-3">
+        <button
+          (click)="cancel()"
+          class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition font-medium"
+        >
+          Отменить
+        </button>
+        <button
+          (click)="confirmSelection()"
+          class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium"
+        >
+          Добавить в заказ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

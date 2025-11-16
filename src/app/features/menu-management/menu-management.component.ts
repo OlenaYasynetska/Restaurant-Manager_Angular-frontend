@@ -1,0 +1,131 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MenuService } from '../../core/services/menu.service';
+import { MenuItem, MenuCategory } from '../../core/models/restaurant.models';
+
+@Component({
+  selector: 'app-menu-management',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './menu-management.component.html',
+})
+export class MenuManagementComponent implements OnInit {
+  menuItems$ = this.menuService.getMenuItems();
+  selectedCategory: MenuCategory | 'all' = 'all';
+  
+  // Модальное окно
+  showModal = false;
+  editingItem: MenuItem | null = null;
+  
+  // Форма
+  formData = {
+    name: '',
+    category: MenuCategory.MAIN_DISHES,
+    price: 0,
+    description: '',
+    preparationTime: 15,
+    available: true,
+    image: ''
+  };
+  
+  // Категории
+  categories = [
+    { value: MenuCategory.APPETIZERS, label: 'Закуски' },
+    { value: MenuCategory.SOUPS, label: 'Супы' },
+    { value: MenuCategory.MAIN_DISHES, label: 'Основные блюда' },
+    { value: MenuCategory.PASTA, label: 'Паста' },
+    { value: MenuCategory.SALADS, label: 'Салаты' },
+    { value: MenuCategory.DESSERTS, label: 'Десерты' },
+    { value: MenuCategory.DRINKS, label: 'Напитки' },
+    { value: MenuCategory.ALCOHOL, label: 'Алкоголь' },
+  ];
+
+  constructor(private menuService: MenuService) {}
+
+  ngOnInit(): void {}
+
+  // Фильтрация по категории
+  getFilteredItems(items: MenuItem[] | null): MenuItem[] {
+    if (!items) return [];
+    if (this.selectedCategory === 'all') return items;
+    return items.filter(item => item.category === this.selectedCategory);
+  }
+
+  // Открыть модальное окно для создания
+  openCreateModal(): void {
+    this.editingItem = null;
+    this.formData = {
+      name: '',
+      category: MenuCategory.MAIN_DISHES,
+      price: 0,
+      description: '',
+      preparationTime: 15,
+      available: true,
+      image: ''
+    };
+    this.showModal = true;
+  }
+
+  // Открыть модальное окно для редактирования
+  openEditModal(item: MenuItem): void {
+    this.editingItem = item;
+    this.formData = {
+      name: item.name,
+      category: item.category,
+      price: item.price,
+      description: item.description || '',
+      preparationTime: item.preparationTime || 15,
+      available: item.available,
+      image: item.image || ''
+    };
+    this.showModal = true;
+  }
+
+  // Закрыть модальное окно
+  closeModal(): void {
+    this.showModal = false;
+    this.editingItem = null;
+  }
+
+  // Сохранить блюдо
+  saveItem(): void {
+    if (!this.formData.name.trim()) {
+      alert('Введите название блюда');
+      return;
+    }
+
+    if (this.formData.price <= 0) {
+      alert('Цена должна быть больше нуля');
+      return;
+    }
+
+    if (this.editingItem) {
+      // Редактирование
+      this.menuService.updateMenuItem(this.editingItem.id, this.formData);
+    } else {
+      // Создание
+      this.menuService.addMenuItem(this.formData);
+    }
+
+    this.closeModal();
+  }
+
+  // Удалить блюдо
+  deleteItem(item: MenuItem): void {
+    if (confirm(`Удалить блюдо "${item.name}"?`)) {
+      this.menuService.deleteMenuItem(item.id);
+    }
+  }
+
+  // Переключить доступность
+  toggleAvailability(item: MenuItem): void {
+    this.menuService.updateMenuItem(item.id, { available: !item.available });
+  }
+
+  // Форматирование цены
+  formatPrice(price: number): string {
+    return `€${price.toLocaleString('ru-RU')}`;
+  }
+}
+

@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Дополнительные утилиты/переменные */
+:root {
+  --brand: #0b6dd4;
+}
+
+/* Простые глобальные классы */
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+.card {
+  @apply bg-white border rounded-lg p-6;
+}
+

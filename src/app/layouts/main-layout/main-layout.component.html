@@ -1,0 +1,90 @@
+<div class="min-h-screen flex bg-slate-50">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r p-4">
+    <div class="flex items-center gap-3 text-xl">
+      <h1 class="text-xl font-semibold">🍽️ Restaurant</h1>
+    </div>
+
+    <!-- Меню nav flex-col gap-2 text-sm -->
+    <nav class="mt-8 flex flex-col gap-2 text-sm">
+      <!-- Панель управления -->
+      <a routerLink="/dashboard" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
+        <span class="text-xl">🏠</span>
+        <span>Панель управления</span>
+      </a>
+
+      <!-- Столики -->
+      <a routerLink="/tables" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
+        <span class="text-xl">🪑</span>
+        <span>Столики</span>
+      </a>
+
+      <!-- Меню блюд (для выбора) -->
+      <a routerLink="/menu" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
+        <span class="text-xl">📋</span>
+        <span>Меню</span>
+      </a>
+
+      <!-- Управление меню -->
+      <a routerLink="/menu-management" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
+        <span class="text-xl">✏️</span>
+        <span>Управление меню</span>
+      </a>
+
+      <!-- Персонал -->
+      <a routerLink="/staff" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
+        <span class="text-xl">👨‍🍳</span>
+        <span>Персонал</span>
+      </a>
+
+      <!-- Аналитика -->
+      <a routerLink="/analytics" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
+        <span class="text-xl">📊</span>
+        <span>Аналитика</span>
+      </a>
+
+      <!-- Склад -->
+      <a routerLink="/warehouse" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
+        <span class="text-xl">🛠</span>
+        <span>Склад</span>
+      </a>
+
+      <!-- Настройки -->
+      <a routerLink="/settings" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
+        <span class="text-xl">⚙️</span>
+        <span>Настройки</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <div class="flex-1 p-8">
+    <header class="mb-8 flex justify-between items-center">
+      <h2 class="text-3xl font-semibold">Добро пожаловать в систему управления рестораном!</h2>
+      
+      <!-- Информация о пользователе и кнопка выхода -->
+      <div class="flex items-center gap-4">
+        <div *ngIf="currentUser$ | async as user" class="text-sm">
+          <span class="text-gray-600">Пользователь:</span>
+          <span class="font-semibold ml-2">{{ user.username }}</span>
+        </div>
+        <button 
+          (click)="logout()"
+          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition duration-200 text-sm font-medium"
+        >
+          Выйти
+        </button>
+      </div>
+    </header>
+
+    <!-- Основной контент с роутингом -->
+    <div class="mt-4">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <footer>
+    <!-- Footer -->
+  </footer>
+</div>
+

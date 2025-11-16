@@ -1,0 +1,115 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Заголовок -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Столики</h1>
+    <p class="text-gray-600">Выберите столик для создания или продолжения заказа</p>
+  </div>
+
+  <!-- Легенда -->
+  <div class="flex flex-wrap gap-4 mb-8 p-4 bg-white rounded-lg shadow-sm">
+    <div class="flex items-center gap-2">
+      <div class="w-4 h-4 rounded border-2 border-green-400 bg-white"></div>
+      <span class="text-sm text-gray-700">Свободен</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="w-4 h-4 rounded border-2 border-purple-400 bg-purple-50"></div>
+      <span class="text-sm text-gray-700">Забронирован</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="w-4 h-4 rounded border-2 border-blue-400 bg-blue-50"></div>
+      <span class="text-sm text-gray-700">Занят</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="w-4 h-4 rounded border-2 border-yellow-400 bg-yellow-50"></div>
+      <span class="text-sm text-gray-700">Ожидает оплаты</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="w-4 h-4 rounded border-2 border-gray-300 bg-gray-100"></div>
+      <span class="text-sm text-gray-700">Закрыт</span>
+    </div>
+  </div>
+
+  <!-- Сетка столиков -->
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+    <div
+      *ngFor="let table of tables$ | async"
+      [class]="getTableClass(table.status)"
+      (click)="onTableClick(table)"
+    >
+      <!-- Иконка статуса -->
+      <div class="text-4xl mb-2">
+        {{ getTableIcon(table.status) }}
+      </div>
+
+      <!-- Номер столика -->
+      <div class="text-2xl font-bold text-gray-800 mb-1">
+        Стол {{ table.number }}
+      </div>
+
+      <!-- Количество мест -->
+      <div *ngIf="table.seats" class="text-sm text-gray-600 mb-2">
+        <span>👥 {{ table.seats }} мест</span>
+      </div>
+
+      <!-- Статус -->
+      <div [class]="'text-sm font-medium ' + getStatusColor(table.status)">
+        {{ getStatusText(table.status) }}
+      </div>
+
+      <!-- ID активного заказа -->
+      <div *ngIf="table.activeOrderId" class="text-xs text-gray-500 mt-2">
+        Заказ #{{ table.activeOrderId }}
+      </div>
+
+      <!-- Кнопки действий -->
+      <div class="mt-4 flex flex-col gap-2 w-full">
+        <!-- Для свободных столиков -->
+        <div *ngIf="table.status === TableStatus.FREE" class="flex flex-col gap-2">
+          <div class="text-xs bg-green-600 text-white px-3 py-1 rounded-full text-center">
+            Создать заказ
+          </div>
+          <button
+            (click)="reserveTable($event, table)"
+            class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-full transition"
+          >
+            📅 Забронировать
+          </button>
+        </div>
+
+        <!-- Для забронированных столиков -->
+        <div
+          *ngIf="table.status === TableStatus.RESERVED"
+          class="text-xs bg-purple-600 text-white px-3 py-1 rounded-full text-center"
+        >
+          Посмотреть бронь
+        </div>
+
+        <!-- Для занятых столиков -->
+        <div
+          *ngIf="table.status === TableStatus.OCCUPIED"
+          class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full text-center"
+        >
+          Открыть заказ
+        </div>
+
+        <!-- Для столиков ожидающих оплату -->
+        <div
+          *ngIf="table.status === TableStatus.WAITING_PAYMENT"
+          class="text-xs bg-yellow-600 text-white px-3 py-1 rounded-full text-center"
+        >
+          К оплате
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Сообщение если нет столиков -->
+  <div
+    *ngIf="(tables$ | async)?.length === 0"
+    class="text-center py-16 text-gray-500"
+  >
+    <div class="text-6xl mb-4">🪑</div>
+    <p class="text-lg">Нет доступных столиков</p>
+  </div>
+</div>
+
