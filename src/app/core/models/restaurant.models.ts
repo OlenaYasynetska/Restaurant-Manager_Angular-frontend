@@ -139,3 +139,78 @@ export interface Shift {
   notes?: string;
 }
 
+// Единицы измерения
+export enum Unit {
+  KG = 'кг',
+  G = 'г',
+  L = 'л',
+  ML = 'мл',
+  PCS = 'шт',
+  PACK = 'уп'
+}
+
+// Категория товара на складе
+export enum WarehouseCategory {
+  MEAT = 'Мясо',
+  FISH = 'Рыба',
+  VEGETABLES = 'Овощи',
+  FRUITS = 'Фрукты',
+  DAIRY = 'Молочные продукты',
+  CEREALS = 'Крупы и макароны',
+  SPICES = 'Специи',
+  DRINKS = 'Напитки',
+  ALCOHOL = 'Алкоголь',
+  OTHER = 'Прочее'
+}
+
+// Тип операции склада
+export enum OperationType {
+  INCOMING = 'Приход',
+  OUTGOING = 'Расход',
+  WRITE_OFF = 'Списание'
+}
+
+// Товар на складе
+export interface WarehouseItem {
+  id: number;
+  name: string;
+  category: WarehouseCategory;
+  quantity: number;        // Текущее количество
+  unit: Unit;              // Единица измерения
+  minQuantity: number;     // Минимальный остаток (для оповещения)
+  price: number;           // Цена за единицу (€)
+  supplier?: string;       // Поставщик
+  lastUpdated: Date;
+}
+
+// Операция на складе
+export interface WarehouseOperation {
+  id: number;
+  itemId: number;
+  itemName: string;
+  type: OperationType;
+  quantity: number;
+  unit: Unit;
+  date: Date;
+  notes?: string;
+  userId?: number;         // Кто провел операцию
+  userName?: string;
+}
+
+// Ингредиент в рецепте (технологической карте)
+export interface RecipeIngredient {
+  warehouseItemId: number;   // ID товара на складе
+  warehouseItemName: string; // Название товара
+  quantity: number;          // Количество на 1 порцию
+  unit: Unit;                // Единица измерения
+}
+
+// Рецепт блюда (технологическая карта)
+export interface Recipe {
+  id: number;
+  menuItemId: number;        // ID блюда в меню
+  menuItemName: string;      // Название блюда
+  ingredients: RecipeIngredient[]; // Ингредиенты
+  description?: string;      // Описание приготовления
+}
+

@@ -112,6 +112,17 @@
         </span>
       </div>
 
+      <!-- Статус заказа -->
+      <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-gray-700">Статус:</span>
+          <span class="px-3 py-1 rounded-full text-sm font-semibold" 
+                [ngClass]="getStatusColor(order.status)">
+            {{ getStatusText(order.status) }}
+          </span>
+        </div>
+      </div>
+
       <div class="flex gap-3">
         <button
           (click)="addItems()"
@@ -119,12 +130,23 @@
         >
           Добавить еще
         </button>
+        
+        <!-- Кнопка "Подано" (списывает ингредиенты со склада) -->
         <button
-          (click)="closeOrder(order)"
+          *ngIf="order.status === 'in_progress'"
+          (click)="markAsServed(order)"
           [disabled]="order.items.length === 0"
-          class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition font-medium"
+          class="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition font-medium"
         >
-          Закрыть заказ и к оплате
+          🍽️ Подано гостям
+        </button>
+        
+        <button
+          *ngIf="order.status === 'served'"
+          (click)="closeOrder(order)"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition font-medium"
+        >
+          💳 К оплате
         </button>
       </div>
     </div>

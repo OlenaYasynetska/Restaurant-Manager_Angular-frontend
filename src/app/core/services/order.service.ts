@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, map } from 'rxjs';
 import { Order, OrderItem, OrderStatus } from '../models/restaurant.models';
 import { MenuService } from './menu.service';
+import { RecipeService } from './recipe.service';
+import { WarehouseService } from './warehouse.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +14,11 @@ export class OrderService {
   private nextOrderId = 4;
   private nextItemId = 100;
 
-  constructor(private menuService: MenuService) {}
+  constructor(
+    private menuService: MenuService,
+    private recipeService: RecipeService,
+    private warehouseService: WarehouseService
+  ) {}
 
   // Получить все заказы
   getOrders(): Observable<Order[]> {
@@ -132,8 +138,54 @@ export class OrderService {
     const orderIndex = orders.findIndex(o => o.id === orderId);
     
     if (orderIndex !== -1) {
-      orders[orderIndex].status = status;
-      orders[orderIndex].updatedAt = new Date();
+      const order = orders[orderIndex];
+      
+      // 🔥 АВТОМАТИЧЕСКОЕ СПИСАНИЕ ИНГРЕДИЕНТОВ ПРИ ПОДАЧЕ БЛЮДА
+      if (status === OrderStatus.SERVED && order.status !== OrderStatus.SERVED) {
+        // Проверяем и списываем ингредиенты для всех блюд в заказе
+        let allIngredientsAvailable = true;
+        const missingIngredients: string[] = [];
+
+        // Сначала проверяем наличие всех ингредиентов
+        for (const orderItem of order.items) {
+          const recipe = this.recipeService.getRecipeByMenuItemId(orderItem.menuItemId);
+          if (recipe) {
+            for (const ingredient of recipe.ingredients) {
+              const warehouseItem = this.warehouseService.getItemById(ingredient.warehouseItemId);
+              const requiredQuantity = ingredient.quantity * orderItem.quantity;
+              
+              if (!warehouseItem || warehouseItem.quantity < requiredQuantity) {
+                allIngredientsAvailable = false;
+                missingIngredients.push(`${ingredient.warehouseItemName} для блюда "${orderItem.name}" (нужно: ${requiredQuantity} ${ingredient.unit}, доступно: ${warehouseItem?.quantity || 0} ${ingredient.unit})`);
+              }
+            }
+          }
+        }
+
+        if (!allIngredientsAvailable) {
+          // Если недостаточно ингредиентов, показываем ошибку и не меняем статус
+          alert(`❌ Невозможно подать блюда!\n\nНедостаточно ингредиентов на складе:\n\n${missingIngredients.join('\n')}\n\nПополните склад перед подачей блюд.`);
+          return;
+        }
+
+        // Если все ингредиенты есть, списываем их
+        for (const orderItem of order.items) {
+          const recipe = this.recipeService.getRecipeByMenuItemId(orderItem.menuItemId);
+          if (recipe) {
+            for (const ingredient of recipe.ingredients) {
+              const requiredQuantity = ingredient.quantity * orderItem.quantity;
+              this.warehouseService.addOutgoing(
+                ingredient.warehouseItemId,
+                requiredQuantity,
+                `Подача блюда: ${orderItem.name} (Заказ #${orderId}, Столик ${order.tableNumber})`
+              );
+            }
+          }
+        }
+      }
+      
+      order.status = status;
+      order.updatedAt = new Date();
       this.ordersSubject.next([...orders]);
     }
   }

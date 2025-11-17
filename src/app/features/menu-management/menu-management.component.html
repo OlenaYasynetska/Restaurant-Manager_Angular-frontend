@@ -111,6 +111,17 @@
             🗑️
           </button>
         </div>
+
+        <!-- Технологическая карта -->
+        <button
+          (click)="openRecipeModal(item)"
+          [class]="'w-full mt-2 px-3 py-2 rounded-lg transition text-sm font-medium ' +
+            (hasRecipe(item.id, recipes$ | async) 
+              ? 'bg-green-50 text-green-700 border border-green-300 hover:bg-green-100' 
+              : 'bg-purple-50 text-purple-700 border border-purple-300 hover:bg-purple-100')"
+        >
+          {{ getRecipeIcon(item.id, recipes$ | async) }} {{ getRecipeButtonText(item.id, recipes$ | async) }}
+        </button>
       </div>
     </div>
   </div>
@@ -297,6 +308,150 @@
             class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium"
           >
             {{ editingItem ? 'Сохранить' : 'Добавить' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Технологическая карта -->
+  <div
+    *ngIf="showRecipeModal && (warehouseItems$ | async) as warehouseItems"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    (click)="closeRecipeModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Заголовок -->
+      <div class="border-b px-6 py-4 flex justify-between items-center bg-purple-50">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">
+            📋 Технологическая карта
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">{{ selectedMenuItem?.name }}</p>
+        </div>
+        <button
+          (click)="closeRecipeModal()"
+          class="text-gray-400 hover:text-gray-600 transition"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Форма рецепта -->
+      <form (ngSubmit)="saveRecipe()" class="p-6">
+        <div class="space-y-4">
+          <!-- Ингредиенты -->
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <label class="text-lg font-semibold text-gray-800">Ингредиенты</label>
+              <button
+                type="button"
+                (click)="addIngredient()"
+                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition text-sm font-medium flex items-center gap-1"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Добавить
+              </button>
+            </div>
+
+            <div class="space-y-3">
+              <div
+                *ngFor="let ingredient of recipeFormData; let i = index"
+                class="flex gap-3 items-start bg-gray-50 p-3 rounded-lg"
+              >
+                <!-- Товар со склада -->
+                <div class="flex-1">
+                  <select
+                    [(ngModel)]="ingredient.warehouseItemId"
+                    [name]="'ingredient-item-' + i"
+                    (change)="onIngredientChange(i, ingredient.warehouseItemId, warehouseItems)"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none text-sm"
+                    required
+                  >
+                    <option [value]="0">Выберите товар</option>
+                    <option *ngFor="let warehouseItem of warehouseItems" [value]="warehouseItem.id">
+                      {{ warehouseItem.name }} ({{ warehouseItem.quantity }} {{ warehouseItem.unit }})
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Количество -->
+                <div class="w-32">
+                  <input
+                    type="number"
+                    [(ngModel)]="ingredient.quantity"
+                    [name]="'ingredient-qty-' + i"
+                    min="0"
+                    step="0.001"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none text-sm"
+                    placeholder="Кол-во"
+                    required
+                  />
+                </div>
+
+                <!-- Единица измерения (readonly) -->
+                <div class="w-20">
+                  <input
+                    type="text"
+                    [value]="ingredient.unit"
+                    class="w-full px-3 py-2 border border-gray-200 bg-gray-100 rounded-lg text-sm text-gray-600 text-center"
+                    readonly
+                  />
+                </div>
+
+                <!-- Кнопка удаления -->
+                <button
+                  type="button"
+                  (click)="removeIngredient(i)"
+                  class="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded transition"
+                  title="Удалить"
+                >
+                  🗑️
+                </button>
+              </div>
+
+              <div *ngIf="recipeFormData.length === 0" class="text-center py-6 text-gray-500">
+                <p>Добавьте ингредиенты для блюда</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Описание приготовления -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Описание приготовления
+            </label>
+            <textarea
+              [(ngModel)]="recipeDescription"
+              name="recipeDescription"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none resize-none text-sm"
+              placeholder="Порядок действий, температура, время..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Кнопки -->
+        <div class="flex gap-3 mt-6">
+          <button
+            type="button"
+            (click)="closeRecipeModal()"
+            class="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition font-medium"
+          >
+            Отмена
+          </button>
+          <button
+            type="submit"
+            class="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition font-medium"
+          >
+            {{ editingRecipe ? 'Сохранить карту' : 'Создать карту' }}
           </button>
         </div>
       </form>

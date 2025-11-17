@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, switchMap, of } from 'rxjs';
 import { TableService } from '../../core/services/table.service';
 import { OrderService } from '../../core/services/order.service';
-import { Order, Table } from '../../core/models/restaurant.models';
+import { Order, Table, OrderStatus } from '../../core/models/restaurant.models';
 
 @Component({
   selector: 'app-order-detail',
@@ -64,6 +64,18 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
+  // Отметить как поданное (списание ингредиентов со склада)
+  markAsServed(order: Order): void {
+    if (order.items.length === 0) {
+      alert('Заказ пустой! Добавьте блюда.');
+      return;
+    }
+
+    if (confirm('Подать блюда гостям?\n\nИнгредиенты будут автоматически списаны со склада согласно технологическим картам.')) {
+      this.orderService.updateOrderStatus(order.id, OrderStatus.SERVED);
+    }
+  }
+
   // Закрыть заказ и перейти к оплате
   closeOrder(order: Order): void {
     if (order.items.length === 0) {
@@ -81,6 +93,42 @@ export class OrderDetailComponent implements OnInit {
   // Вернуться к столикам
   goBack(): void {
     this.router.navigate(['/tables']);
+  }
+
+  // Получить текст статуса
+  getStatusText(status: OrderStatus): string {
+    switch (status) {
+      case OrderStatus.NEW:
+        return 'Новый';
+      case OrderStatus.IN_PROGRESS:
+        return 'Готовится';
+      case OrderStatus.SERVED:
+        return 'Подано';
+      case OrderStatus.WAITING_PAYMENT:
+        return 'Ожидает оплаты';
+      case OrderStatus.PAID:
+        return 'Оплачен';
+      default:
+        return status;
+    }
+  }
+
+  // Получить цвет статуса
+  getStatusColor(status: OrderStatus): string {
+    switch (status) {
+      case OrderStatus.NEW:
+        return 'bg-gray-100 text-gray-700';
+      case OrderStatus.IN_PROGRESS:
+        return 'bg-blue-100 text-blue-700';
+      case OrderStatus.SERVED:
+        return 'bg-purple-100 text-purple-700';
+      case OrderStatus.WAITING_PAYMENT:
+        return 'bg-yellow-100 text-yellow-700';
+      case OrderStatus.PAID:
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
   }
 
   // Форматирование цены
