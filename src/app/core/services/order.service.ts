@@ -68,6 +68,15 @@ export class OrderService {
       const menuItem = this.menuService.getMenuItemById(menuItemId);
       
       if (menuItem) {
+        const missingIngredients = this.reserveIngredients(menuItemId, quantity, orderId, menuItem.name);
+        if (missingIngredients.length > 0) {
+          alert(
+            `❌ Не удалось списать ингредиенты для "${menuItem.name}".\n` +
+            `Пожалуйста, пополните склад и повторите попытку.\n\n` +
+            missingIngredients.join('\n')
+          );
+          return;
+        }
         // Проверяем, есть ли уже такая позиция
         const existingItemIndex = order.items.findIndex(item => item.menuItemId === menuItemId);
         
@@ -137,57 +146,49 @@ export class OrderService {
     const orders = this.ordersSubject.value;
     const orderIndex = orders.findIndex(o => o.id === orderId);
     
-    if (orderIndex !== -1) {
-      const order = orders[orderIndex];
-      
-      // 🔥 АВТОМАТИЧЕСКОЕ СПИСАНИЕ ИНГРЕДИЕНТОВ ПРИ ПОДАЧЕ БЛЮДА
-      if (status === OrderStatus.SERVED && order.status !== OrderStatus.SERVED) {
-        // Проверяем и списываем ингредиенты для всех блюд в заказе
-        let allIngredientsAvailable = true;
-        const missingIngredients: string[] = [];
-
-        // Сначала проверяем наличие всех ингредиентов
-        for (const orderItem of order.items) {
-          const recipe = this.recipeService.getRecipeByMenuItemId(orderItem.menuItemId);
-          if (recipe) {
-            for (const ingredient of recipe.ingredients) {
-              const warehouseItem = this.warehouseService.getItemById(ingredient.warehouseItemId);
-              const requiredQuantity = ingredient.quantity * orderItem.quantity;
-              
-              if (!warehouseItem || warehouseItem.quantity < requiredQuantity) {
-                allIngredientsAvailable = false;
-                missingIngredients.push(`${ingredient.warehouseItemName} для блюда "${orderItem.name}" (нужно: ${requiredQuantity} ${ingredient.unit}, доступно: ${warehouseItem?.quantity || 0} ${ingredient.unit})`);
-              }
-            }
-          }
-        }
-
-        if (!allIngredientsAvailable) {
-          // Если недостаточно ингредиентов, показываем ошибку и не меняем статус
-          alert(`❌ Невозможно подать блюда!\n\nНедостаточно ингредиентов на складе:\n\n${missingIngredients.join('\n')}\n\nПополните склад перед подачей блюд.`);
-          return;
-        }
-
-        // Если все ингредиенты есть, списываем их
-        for (const orderItem of order.items) {
-          const recipe = this.recipeService.getRecipeByMenuItemId(orderItem.menuItemId);
-          if (recipe) {
-            for (const ingredient of recipe.ingredients) {
-              const requiredQuantity = ingredient.quantity * orderItem.quantity;
-              this.warehouseService.addOutgoing(
-                ingredient.warehouseItemId,
-                requiredQuantity,
-                `Подача блюда: ${orderItem.name} (Заказ #${orderId}, Столик ${order.tableNumber})`
-              );
-            }
-          }
-        }
+      if (orderIndex !== -1) {
+        const order = orders[orderIndex];
+        order.status = status;
+        order.updatedAt = new Date();
+        this.ordersSubject.next([...orders]);
       }
-      
-      order.status = status;
-      order.updatedAt = new Date();
-      this.ordersSubject.next([...orders]);
+  }
+
+  private reserveIngredients(menuItemId: number, quantity: number, orderId: number, menuItemName: string): string[] {
+    const recipe = this.recipeService.getRecipeByMenuItemId(menuItemId);
+    if (!recipe || quantity <= 0) {
+      return [];
     }
+
+    const missingIngredients: string[] = [];
+    const notes = `Заказ #${orderId}, блюдо "${menuItemName}"`;
+
+    for (const ingredient of recipe.ingredients) {
+      const warehouseItem = this.warehouseService.getItemById(ingredient.warehouseItemId);
+      const requiredQuantity = ingredient.quantity * quantity;
+
+      if (!warehouseItem || warehouseItem.quantity < requiredQuantity) {
+        const availableAmount = warehouseItem ? warehouseItem.quantity : 0;
+        missingIngredients.push(
+          `${ingredient.warehouseItemName}: необходимо ${requiredQuantity} ${ingredient.unit}, доступно ${availableAmount} ${ingredient.unit}`
+        );
+      }
+    }
+
+    if (missingIngredients.length > 0) {
+      return missingIngredients;
+    }
+
+    for (const ingredient of recipe.ingredients) {
+      const requiredQuantity = ingredient.quantity * quantity;
+      this.warehouseService.addOutgoing(
+        ingredient.warehouseItemId,
+        requiredQuantity,
+        `${notes} (списание)`
+      );
+    }
+
+    return [];
   }
 
   // Закрыть заказ (перевести на оплату)

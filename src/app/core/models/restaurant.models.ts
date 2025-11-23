@@ -137,6 +137,8 @@ export interface Shift {
   endTime: string;     // Время окончания (HH:MM)
   hours: number;       // Количество часов
   notes?: string;
+  actualStartTime?: string; // Фактическое прибытие
+  actualEndTime?: string;   // Фактическое увольнение
 }
 
 // Единицы измерения

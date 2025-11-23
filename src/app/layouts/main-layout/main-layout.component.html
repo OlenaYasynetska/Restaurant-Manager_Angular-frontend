@@ -10,49 +10,49 @@
       <!-- Панель управления -->
       <a routerLink="/dashboard" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
         <span class="text-xl">🏠</span>
-        <span>Панель управления</span>
+        <span>{{ 'nav.dashboard' | translate }}</span>
       </a>
 
       <!-- Столики -->
       <a routerLink="/tables" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
         <span class="text-xl">🪑</span>
-        <span>Столики</span>
+        <span>{{ 'nav.tables' | translate }}</span>
       </a>
 
       <!-- Меню блюд (для выбора) -->
       <a routerLink="/menu" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
         <span class="text-xl">📋</span>
-        <span>Меню</span>
+        <span>{{ 'nav.menu' | translate }}</span>
       </a>
 
       <!-- Управление меню -->
       <a routerLink="/menu-management" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
         <span class="text-xl">✏️</span>
-        <span>Управление меню</span>
+        <span>{{ 'nav.menu.management' | translate }}</span>
       </a>
 
       <!-- Персонал -->
       <a routerLink="/staff" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
         <span class="text-xl">👨‍🍳</span>
-        <span>Персонал</span>
+        <span>{{ 'nav.staff' | translate }}</span>
       </a>
 
       <!-- Аналитика -->
       <a routerLink="/analytics" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
         <span class="text-xl">📊</span>
-        <span>Аналитика</span>
+        <span>{{ 'nav.analytics' | translate }}</span>
       </a>
 
       <!-- Склад -->
       <a routerLink="/warehouse" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
         <span class="text-xl">🛠</span>
-        <span>Склад</span>
+        <span>{{ 'nav.warehouse' | translate }}</span>
       </a>
 
       <!-- Настройки -->
       <a routerLink="/settings" routerLinkActive="bg-blue-50 text-blue-600" [routerLinkActiveOptions]="{exact: false}" class="flex items-center gap-3 px-4 py-3 rounded hover:bg-slate-100 transition">
         <span class="text-xl">⚙️</span>
-        <span>Настройки</span>
+        <span>{{ 'nav.settings' | translate }}</span>
       </a>
     </nav>
   </aside>
@@ -60,19 +60,47 @@
   <!-- Main content -->
   <div class="flex-1 p-8">
     <header class="mb-8 flex justify-between items-center">
-      <h2 class="text-3xl font-semibold">Добро пожаловать в систему управления рестораном!</h2>
+      <h2 class="text-3xl font-semibold">{{ 'header.welcome' | translate }}</h2>
       
-      <!-- Информация о пользователе и кнопка выхода -->
+      <!-- Информация о пользователе, переключатель языков и кнопка выхода -->
       <div class="flex items-center gap-4">
+        <!-- Переключатель языков -->
+        <div class="flex items-center gap-2 bg-white rounded-lg shadow-md p-2">
+          <button
+            (click)="setLanguage('ru')"
+            [class]="'px-3 py-1 rounded text-sm font-medium transition ' + 
+              ((currentLanguage$ | async) === 'ru' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100')"
+            title="Русский"
+          >
+            RU
+          </button>
+          <button
+            (click)="setLanguage('en')"
+            [class]="'px-3 py-1 rounded text-sm font-medium transition ' + 
+              ((currentLanguage$ | async) === 'en' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100')"
+            title="English"
+          >
+            EN
+          </button>
+          <button
+            (click)="setLanguage('de')"
+            [class]="'px-3 py-1 rounded text-sm font-medium transition ' + 
+              ((currentLanguage$ | async) === 'de' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100')"
+            title="Deutsch"
+          >
+            DE
+          </button>
+        </div>
+        
         <div *ngIf="currentUser$ | async as user" class="text-sm">
-          <span class="text-gray-600">Пользователь:</span>
+          <span class="text-gray-600">{{ 'header.user' | translate }}</span>
           <span class="font-semibold ml-2">{{ user.username }}</span>
         </div>
         <button 
           (click)="logout()"
           class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition duration-200 text-sm font-medium"
         >
-          Выйти
+          {{ 'header.logout' | translate }}
         </button>
       </div>
     </header>

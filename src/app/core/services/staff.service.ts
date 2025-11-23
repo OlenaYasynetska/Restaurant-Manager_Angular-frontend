@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Staff, Shift, StaffRole } from '../models/restaurant.models';
+import { mockStaff, buildMockShifts } from '../../data/mock-staff';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StaffService {
-  private staffSubject = new BehaviorSubject<Staff[]>(this.getMockStaff());
-  private shiftsSubject = new BehaviorSubject<Shift[]>(this.getMockShifts());
+  private readonly STAFF_STORAGE_KEY = 'restaurant_staff';
+  private readonly SHIFTS_STORAGE_KEY = 'restaurant_shifts';
+
+  private staffSubject = new BehaviorSubject<Staff[]>(this.loadStaff());
+  private shiftsSubject = new BehaviorSubject<Shift[]>(this.loadShifts());
   
   staff$ = this.staffSubject.asObservable();
   shifts$ = this.shiftsSubject.asObservable();
@@ -15,7 +19,17 @@ export class StaffService {
   private nextStaffId = 6;
   private nextShiftId = 11;
 
-  constructor() {}
+  constructor() {
+    const staff = this.staffSubject.value;
+    if (staff.length > 0) {
+      this.nextStaffId = Math.max(...staff.map(s => s.id)) + 1;
+    }
+
+    const shifts = this.shiftsSubject.value;
+    if (shifts.length > 0) {
+      this.nextShiftId = Math.max(...shifts.map(s => s.id)) + 1;
+    }
+  }
 
   // === СОТРУДНИКИ ===
 
@@ -41,6 +55,7 @@ export class StaffService {
 
     const current = this.staffSubject.value;
     this.staffSubject.next([...current, newStaff]);
+    this.saveStaff([...current, newStaff]);
     return newStaff;
   }
 
@@ -51,12 +66,15 @@ export class StaffService {
     if (index !== -1) {
       current[index] = { ...current[index], ...data, id };
       this.staffSubject.next([...current]);
+      this.saveStaff(current);
     }
   }
 
   deleteStaff(id: number): void {
     const current = this.staffSubject.value;
-    this.staffSubject.next(current.filter(s => s.id !== id));
+    const next = current.filter(s => s.id !== id);
+    this.staffSubject.next(next);
+    this.saveStaff(next);
   }
 
   // === СМЕНЫ ===
@@ -86,11 +104,15 @@ export class StaffService {
       startTime: data.startTime || '09:00',
       endTime: data.endTime || '18:00',
       hours: hours,
-      notes: data.notes
+      notes: data.notes,
+      actualStartTime: data.actualStartTime,
+      actualEndTime: data.actualEndTime
     };
 
     const current = this.shiftsSubject.value;
-    this.shiftsSubject.next([...current, newShift]);
+    const updated = [...current, newShift];
+    this.shiftsSubject.next(updated);
+    this.saveShifts(updated);
     return newShift;
   }
 
@@ -104,14 +126,18 @@ export class StaffService {
       const endTime = data.endTime || shift.endTime;
       const hours = this.calculateHours(startTime, endTime);
       
-      current[index] = { ...shift, ...data, id, hours };
-      this.shiftsSubject.next([...current]);
+      const updated = [...current];
+      updated[index] = { ...shift, ...data, id, hours };
+      this.shiftsSubject.next(updated);
+      this.saveShifts(updated);
     }
   }
 
   deleteShift(id: number): void {
     const current = this.shiftsSubject.value;
-    this.shiftsSubject.next(current.filter(s => s.id !== id));
+    const next = current.filter(s => s.id !== id);
+    this.shiftsSubject.next(next);
+    this.saveShifts(next);
   }
 
   // === РАСЧЕТЫ ===
@@ -147,87 +173,48 @@ export class StaffService {
     return totalHours * staff.hourlyRate;
   }
 
-  // === MOCK DATA ===
+  // Локальное хранилище
 
-  private getMockStaff(): Staff[] {
-    return [
-      {
-        id: 1,
-        name: 'Иванов Иван',
-        role: StaffRole.WAITER,
-        phone: '+7 (999) 123-45-67',
-        email: 'ivanov@restaurant.com',
-        hourlyRate: 8,
-        hiredDate: new Date('2024-01-15'),
-        active: true
-      },
-      {
-        id: 2,
-        name: 'Петрова Мария',
-        role: StaffRole.WAITER,
-        phone: '+7 (999) 234-56-78',
-        email: 'petrova@restaurant.com',
-        hourlyRate: 8,
-        hiredDate: new Date('2024-02-01'),
-        active: true
-      },
-      {
-        id: 3,
-        name: 'Сидоров Петр',
-        role: StaffRole.COOK,
-        phone: '+7 (999) 345-67-89',
-        email: 'sidorov@restaurant.com',
-        hourlyRate: 12,
-        hiredDate: new Date('2023-11-10'),
-        active: true
-      },
-      {
-        id: 4,
-        name: 'Козлова Анна',
-        role: StaffRole.BARTENDER,
-        phone: '+7 (999) 456-78-90',
-        email: 'kozlova@restaurant.com',
-        hourlyRate: 10,
-        hiredDate: new Date('2024-03-01'),
-        active: true
-      },
-      {
-        id: 5,
-        name: 'Смирнов Алексей',
-        role: StaffRole.MANAGER,
-        phone: '+7 (999) 567-89-01',
-        email: 'smirnov@restaurant.com',
-        hourlyRate: 15,
-        hiredDate: new Date('2023-09-01'),
-        active: true
+  private loadStaff(): Staff[] {
+    const saved = localStorage.getItem(this.STAFF_STORAGE_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        console.error('Не удалось разобрать сотрудников из localStorage');
       }
-    ];
+    }
+
+    this.saveStaff(mockStaff);
+    return mockStaff;
   }
 
-  private getMockShifts(): Shift[] {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    return [
-      // Вчера
-      { id: 1, staffId: 1, date: yesterday, startTime: '10:00', endTime: '18:00', hours: 8, notes: '' },
-      { id: 2, staffId: 2, date: yesterday, startTime: '14:00', endTime: '22:00', hours: 8, notes: '' },
-      { id: 3, staffId: 3, date: yesterday, startTime: '09:00', endTime: '17:00', hours: 8, notes: '' },
-      
-      // Сегодня
-      { id: 4, staffId: 1, date: today, startTime: '10:00', endTime: '18:00', hours: 8, notes: '' },
-      { id: 5, staffId: 2, date: today, startTime: '14:00', endTime: '22:00', hours: 8, notes: '' },
-      { id: 6, staffId: 3, date: today, startTime: '09:00', endTime: '17:00', hours: 8, notes: '' },
-      { id: 7, staffId: 4, date: today, startTime: '16:00', endTime: '00:00', hours: 8, notes: '' },
-      
-      // Завтра
-      { id: 8, staffId: 1, date: tomorrow, startTime: '10:00', endTime: '18:00', hours: 8, notes: '' },
-      { id: 9, staffId: 3, date: tomorrow, startTime: '09:00', endTime: '17:00', hours: 8, notes: '' },
-      { id: 10, staffId: 5, date: tomorrow, startTime: '12:00', endTime: '20:00', hours: 8, notes: '' },
-    ];
+  private saveStaff(staff: Staff[]): void {
+    localStorage.setItem(this.STAFF_STORAGE_KEY, JSON.stringify(staff));
   }
+
+  private loadShifts(): Shift[] {
+    const saved = localStorage.getItem(this.SHIFTS_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed: Shift[] = JSON.parse(saved);
+        return parsed.map(shift => ({
+          ...shift,
+          date: new Date(shift.date)
+        }));
+      } catch {
+        console.error('Не удалось разобрать смены из localStorage');
+      }
+    }
+
+    const fallback = buildMockShifts();
+    this.saveShifts(fallback);
+    return fallback;
+  }
+
+  private saveShifts(shifts: Shift[]): void {
+    localStorage.setItem(this.SHIFTS_STORAGE_KEY, JSON.stringify(shifts));
+  }
+
 }
 

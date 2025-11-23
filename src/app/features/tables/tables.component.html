@@ -87,9 +87,17 @@
         <!-- Для занятых столиков -->
         <div
           *ngIf="table.status === TableStatus.OCCUPIED"
-          class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full text-center"
+          class="flex flex-col gap-2"
         >
-          Открыть заказ
+          <div class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full text-center">
+            Открыть заказ
+          </div>
+          <button
+            (click)="markTableWaitingPayment($event, table)"
+            class="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full transition"
+          >
+            💳 Отметить к оплате
+          </button>
         </div>
 
         <!-- Для столиков ожидающих оплату -->

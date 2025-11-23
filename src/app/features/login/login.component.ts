@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { LanguageService, Language } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-login',
@@ -15,15 +16,25 @@ export class LoginComponent {
   password: string = '';
   errorMessage: string = '';
   isLoading: boolean = false;
+  currentLanguage$ = this.languageService.currentLanguage$;
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    public languageService: LanguageService
   ) {}
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  setLanguage(lang: Language): void {
+    this.languageService.setLanguage(lang);
+  }
 
   onSubmit(): void {
     if (!this.username || !this.password) {
-      this.errorMessage = 'Пожалуйста, заполните все поля';
+      this.errorMessage = this.translate('login.error.fill');
       return;
     }
 
@@ -36,12 +47,12 @@ export class LoginComponent {
           // Перенаправляем на главную страницу после успешного входа
           this.router.navigate(['/dashboard']);
         } else {
-          this.errorMessage = 'Неверные данные для входа';
+          this.errorMessage = this.translate('login.error.invalid');
           this.isLoading = false;
         }
       },
       error: (error) => {
-        this.errorMessage = 'Произошла ошибка при входе';
+        this.errorMessage = this.translate('login.error.general');
         this.isLoading = false;
       }
     });

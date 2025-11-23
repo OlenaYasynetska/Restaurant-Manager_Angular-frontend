@@ -5,7 +5,7 @@ import { TableService } from '../../core/services/table.service';
 import { OrderService } from '../../core/services/order.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ReservationService } from '../../core/services/reservation.service';
-import { Table, TableStatus } from '../../core/models/restaurant.models';
+import { Table, TableStatus, OrderStatus } from '../../core/models/restaurant.models';
 
 @Component({
   selector: 'app-tables',
@@ -173,6 +173,22 @@ export class TablesComponent implements OnInit {
     } else {
       alert('Информация о бронировании не найдена');
     }
+  }
+
+  markTableWaitingPayment(event: Event, table: Table): void {
+    event.stopPropagation();
+
+    if (!table.activeOrderId) {
+      alert('Для этого столика нет активного заказа.');
+      return;
+    }
+
+    if (!confirm('Отметить столик как "к оплате"? Пока гость не оплатит, карточка останется жёлтой.')) {
+      return;
+    }
+
+    this.orderService.updateOrderStatus(table.activeOrderId, OrderStatus.WAITING_PAYMENT);
+    this.tableService.setWaitingPayment(table.id);
   }
 }
 
