@@ -6,11 +6,45 @@ import { Reservation } from '../models/restaurant.models';
   providedIn: 'root'
 })
 export class ReservationService {
-  private reservationsSubject = new BehaviorSubject<Reservation[]>([]);
+  private readonly STORAGE_KEY = 'restaurant_reservations';
+  private reservationsSubject = new BehaviorSubject<Reservation[]>(this.loadFromLocalStorage());
   public reservations$ = this.reservationsSubject.asObservable();
-  private nextReservationId = 1;
+  private nextReservationId: number;
 
-  constructor() {}
+  constructor() {
+    const reservations = this.reservationsSubject.value;
+    if (reservations.length > 0) {
+      this.nextReservationId = Math.max(...reservations.map(r => r.id)) + 1;
+    } else {
+      this.nextReservationId = 1;
+    }
+  }
+
+  private loadFromLocalStorage(): Reservation[] {
+    try {
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Преобразуем строки дат обратно в объекты Date
+        return parsed.map((r: any) => ({
+          ...r,
+          reservationTime: new Date(r.reservationTime),
+          createdAt: new Date(r.createdAt)
+        }));
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке бронирований из localStorage:', error);
+    }
+    return [];
+  }
+
+  private saveToLocalStorage(reservations: Reservation[]): void {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(reservations));
+    } catch (error) {
+      console.error('Ошибка при сохранении бронирований в localStorage:', error);
+    }
+  }
 
   // Получить все бронирования
   getReservations(): Observable<Reservation[]> {
@@ -48,7 +82,9 @@ export class ReservationService {
     };
 
     const reservations = this.reservationsSubject.value;
-    this.reservationsSubject.next([...reservations, newReservation]);
+    const updated = [...reservations, newReservation];
+    this.reservationsSubject.next(updated);
+    this.saveToLocalStorage(updated);
     
     return newReservation;
   }
@@ -57,12 +93,14 @@ export class ReservationService {
   cancelReservation(reservationId: number): void {
     const reservations = this.reservationsSubject.value.filter(r => r.id !== reservationId);
     this.reservationsSubject.next(reservations);
+    this.saveToLocalStorage(reservations);
   }
 
   // Удалить бронирование для столика
   cancelReservationByTableId(tableId: number): void {
     const reservations = this.reservationsSubject.value.filter(r => r.tableId !== tableId);
     this.reservationsSubject.next(reservations);
+    this.saveToLocalStorage(reservations);
   }
 }
 

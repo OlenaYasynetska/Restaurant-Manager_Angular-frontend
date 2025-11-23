@@ -475,6 +475,92 @@ export class LanguageService {
       ru: 'Заказать',
       en: 'Order',
       de: 'Bestellen'
+    },
+    // Dashboard
+    'dashboard.title': {
+      ru: 'Панель управления',
+      en: 'Control Panel',
+      de: 'Bedienfeld'
+    },
+    'dashboard.subtitle': {
+      ru: 'Обзор работы ресторана',
+      en: 'Restaurant Operations Overview',
+      de: 'Restaurant-Betriebsübersicht'
+    },
+    'dashboard.tables': {
+      ru: 'Столики',
+      en: 'Tables',
+      de: 'Tische'
+    },
+    'dashboard.tables.total': {
+      ru: 'Всего:',
+      en: 'Total:',
+      de: 'Gesamt:'
+    },
+    'dashboard.tables.occupied': {
+      ru: 'Занято:',
+      en: 'Occupied:',
+      de: 'Besetzt:'
+    },
+    'dashboard.tables.reserved': {
+      ru: 'Забронировано:',
+      en: 'Reserved:',
+      de: 'Reserviert:'
+    },
+    'dashboard.tables.goTo': {
+      ru: 'Перейти к столикам →',
+      en: 'Go to tables →',
+      de: 'Zu Tischen gehen →'
+    },
+    'dashboard.orders': {
+      ru: 'Заказы',
+      en: 'Orders',
+      de: 'Bestellungen'
+    },
+    'dashboard.orders.active': {
+      ru: 'Активных:',
+      en: 'Active:',
+      de: 'Aktiv:'
+    },
+    'dashboard.orders.averageCheck': {
+      ru: 'Средний чек:',
+      en: 'Average check:',
+      de: 'Durchschnittlicher Rechnungsbetrag:'
+    },
+    'dashboard.revenue': {
+      ru: 'Выручка сегодня',
+      en: 'Revenue today',
+      de: 'Umsatz heute'
+    },
+    'dashboard.revenue.compare': {
+      ru: '↑ +12% к вчерашнему дню',
+      en: '↑ +12% compared to yesterday',
+      de: '↑ +12% im Vergleich zu gestern'
+    },
+    'dashboard.quickActions': {
+      ru: 'Быстрые действия',
+      en: 'Quick Actions',
+      de: 'Schnellaktionen'
+    },
+    'dashboard.quickActions.newOrder': {
+      ru: 'Новый заказ',
+      en: 'New Order',
+      de: 'Neue Bestellung'
+    },
+    'dashboard.quickActions.booking': {
+      ru: 'Бронирование',
+      en: 'Booking',
+      de: 'Reservierung'
+    },
+    'dashboard.quickActions.menu': {
+      ru: 'Меню',
+      en: 'Menu',
+      de: 'Speisekarte'
+    },
+    'dashboard.quickActions.reports': {
+      ru: 'Отчеты',
+      en: 'Reports',
+      de: 'Berichte'
     }
   };
 
