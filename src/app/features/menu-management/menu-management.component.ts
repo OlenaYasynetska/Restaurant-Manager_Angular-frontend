@@ -4,12 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { MenuService } from '../../core/services/menu.service';
 import { RecipeService } from '../../core/services/recipe.service';
 import { WarehouseService } from '../../core/services/warehouse.service';
-import { MenuItem, MenuCategory, Recipe, RecipeIngredient, Unit, WarehouseItem } from '../../core/models/restaurant.models';
+import { MenuItem, MenuCategory, Recipe, RecipeIngredient, Unit, WarehouseItem, TranslatedText } from '../../core/models/restaurant.models';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-menu-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './menu-management.component.html',
 })
 export class MenuManagementComponent implements OnInit {
@@ -45,20 +47,21 @@ export class MenuManagementComponent implements OnInit {
   
   // Категории
   categories = [
-    { value: MenuCategory.APPETIZERS, label: 'Закуски' },
-    { value: MenuCategory.SOUPS, label: 'Супы' },
-    { value: MenuCategory.MAIN_DISHES, label: 'Основные блюда' },
-    { value: MenuCategory.PASTA, label: 'Паста' },
-    { value: MenuCategory.SALADS, label: 'Салаты' },
-    { value: MenuCategory.DESSERTS, label: 'Десерты' },
-    { value: MenuCategory.DRINKS, label: 'Напитки' },
-    { value: MenuCategory.ALCOHOL, label: 'Алкоголь' },
+    { value: MenuCategory.APPETIZERS, labelKey: 'menu.category.appetizers' },
+    { value: MenuCategory.SOUPS, labelKey: 'menu.category.soups' },
+    { value: MenuCategory.MAIN_DISHES, labelKey: 'menu.category.main' },
+    { value: MenuCategory.PASTA, labelKey: 'menu.category.pasta' },
+    { value: MenuCategory.SALADS, labelKey: 'menu.category.salads' },
+    { value: MenuCategory.DESSERTS, labelKey: 'menu.category.desserts' },
+    { value: MenuCategory.DRINKS, labelKey: 'menu.category.drinks' },
+    { value: MenuCategory.ALCOHOL, labelKey: 'menu.category.alcohol' },
   ];
 
   constructor(
     private menuService: MenuService,
     private recipeService: RecipeService,
-    private warehouseService: WarehouseService
+    private warehouseService: WarehouseService,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit(): void {}
@@ -111,12 +114,12 @@ export class MenuManagementComponent implements OnInit {
   // Сохранить блюдо
   saveItem(): void {
     if (!this.formData.name.trim()) {
-      alert('Введите название блюда');
+      alert(this.t('menuManage.alert.nameRequired'));
       return;
     }
 
     if (this.formData.price <= 0) {
-      alert('Цена должна быть больше нуля');
+      alert(this.t('menuManage.alert.pricePositive'));
       return;
     }
 
@@ -133,7 +136,7 @@ export class MenuManagementComponent implements OnInit {
 
   // Удалить блюдо
   deleteItem(item: MenuItem): void {
-    if (confirm(`Удалить блюдо "${item.name}"?`)) {
+    if (confirm(`${this.t('menuManage.alert.deleteConfirm')} "${item.name}"?`)) {
       this.menuService.deleteMenuItem(item.id);
     }
   }
@@ -145,7 +148,11 @@ export class MenuManagementComponent implements OnInit {
 
   // Форматирование цены
   formatPrice(price: number): string {
-    return `€${price.toLocaleString('ru-RU')}`;
+    const locale = this.getLocale();
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(price);
   }
 
   // Обработка загрузки фото
@@ -156,13 +163,13 @@ export class MenuManagementComponent implements OnInit {
       
       // Проверка типа файла
       if (!file.type.startsWith('image/')) {
-        alert('Пожалуйста, выберите файл изображения');
+        alert(this.t('menuManage.alert.fileType'));
         return;
       }
 
       // Проверка размера (максимум 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('Размер файла не должен превышать 5MB');
+        alert(this.t('menuManage.alert.fileSize'));
         return;
       }
 
@@ -244,7 +251,7 @@ export class MenuManagementComponent implements OnInit {
     );
 
     if (validIngredients.length === 0) {
-      alert('Добавьте хотя бы один ингредиент');
+      alert(this.t('menuManage.alert.addIngredient'));
       return;
     }
 
@@ -279,7 +286,92 @@ export class MenuManagementComponent implements OnInit {
 
   // Получить текст для кнопки технологической карты
   getRecipeButtonText(menuItemId: number, recipes: Recipe[] | null): string {
-    return this.hasRecipe(menuItemId, recipes) ? 'Редактировать карту' : 'Создать карту';
+    return this.hasRecipe(menuItemId, recipes) ? 'menuManage.recipeBtn.edit' : 'menuManage.recipeBtn.create';
+  }
+
+  getCategoryTranslationKey(category: MenuCategory): string {
+    switch (category) {
+      case MenuCategory.APPETIZERS:
+        return 'menu.category.appetizers';
+      case MenuCategory.SOUPS:
+        return 'menu.category.soups';
+      case MenuCategory.MAIN_DISHES:
+        return 'menu.category.main';
+      case MenuCategory.PASTA:
+        return 'menu.category.pasta';
+      case MenuCategory.SALADS:
+        return 'menu.category.salads';
+      case MenuCategory.DESSERTS:
+        return 'menu.category.desserts';
+      case MenuCategory.DRINKS:
+        return 'menu.category.drinks';
+      case MenuCategory.ALCOHOL:
+        return 'menu.category.alcohol';
+      default:
+        return 'menu.category.all';
+    }
+  }
+
+  private t(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    switch (lang) {
+      case 'de':
+        return 'de-DE';
+      case 'ru':
+        return 'ru-RU';
+      default:
+        return 'en-US';
+    }
+  }
+
+  getLocalizedName(item: MenuItem): string {
+    return this.translateField(item.translations?.name, item.name);
+  }
+
+  getLocalizedDescription(item: MenuItem): string {
+    const fallback = item.description || '';
+    return this.translateField(item.translations?.description, fallback);
+  }
+
+  getWarehouseItemLabel(item: WarehouseItem): string {
+    const name = this.translateField(item.translations?.name, item.name);
+    const unitLabel = this.getUnitLabel(item.unit);
+    return `${name} (${item.quantity} ${unitLabel})`;
+  }
+
+  getUnitLabel(unit: Unit): string {
+    return this.t(this.getUnitTranslationKey(unit));
+  }
+
+  private translateField(text?: TranslatedText, fallback: string = ''): string {
+    if (!text) {
+      return fallback;
+    }
+    const lang = this.languageService.getCurrentLanguage();
+    return text[lang] || fallback;
+  }
+
+  private getUnitTranslationKey(unit: Unit): string {
+    switch (unit) {
+      case Unit.KG:
+        return 'warehouse.unit.kg';
+      case Unit.G:
+        return 'warehouse.unit.g';
+      case Unit.L:
+        return 'warehouse.unit.l';
+      case Unit.ML:
+        return 'warehouse.unit.ml';
+      case Unit.PCS:
+        return 'warehouse.unit.pcs';
+      case Unit.PACK:
+        return 'warehouse.unit.pack';
+      default:
+        return 'warehouse.unit.pcs';
+    }
   }
 }
 

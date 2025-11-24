@@ -1,8 +1,8 @@
 <div class="max-w-7xl mx-auto">
   <!-- Заголовок и статистика -->
   <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">Склад</h1>
-    <p class="text-gray-600">Управление запасами и поставками</p>
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ 'warehouse.title' | translate }}</h1>
+    <p class="text-gray-600">{{ 'warehouse.subtitle' | translate }}</p>
   </div>
 
   <!-- Статистика -->
@@ -10,7 +10,7 @@
     <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm text-gray-600">Всего товаров</p>
+          <p class="text-sm text-gray-600">{{ 'warehouse.stats.totalItems' | translate }}</p>
           <p class="text-3xl font-bold text-gray-900">{{ (items$ | async)?.length || 0 }}</p>
         </div>
         <div class="text-4xl">📦</div>
@@ -20,7 +20,7 @@
     <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm text-gray-600">Низкий остаток</p>
+          <p class="text-sm text-gray-600">{{ 'warehouse.stats.lowStock' | translate }}</p>
           <p class="text-3xl font-bold text-yellow-600">{{ getLowStockCount(items$ | async) }}</p>
         </div>
         <div class="text-4xl">⚠️</div>
@@ -30,7 +30,7 @@
     <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm text-gray-600">Общая стоимость</p>
+          <p class="text-sm text-gray-600">{{ 'warehouse.stats.totalValue' | translate }}</p>
           <p class="text-3xl font-bold text-green-600">{{ formatPrice(getTotalValue()) }}</p>
         </div>
         <div class="text-4xl">💰</div>
@@ -48,7 +48,7 @@
           : 'text-gray-600 hover:text-gray-800'"
         class="pb-3 px-4 transition"
       >
-        📦 Товары
+        {{ 'warehouse.tabs.items' | translate }}
       </button>
       <button
         (click)="activeTab = 'operations'"
@@ -57,7 +57,7 @@
           : 'text-gray-600 hover:text-gray-800'"
         class="pb-3 px-4 transition"
       >
-        📋 История операций
+        {{ 'warehouse.tabs.operations' | translate }}
       </button>
     </nav>
   </div>
@@ -71,8 +71,8 @@
           [(ngModel)]="selectedCategory"
           class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         >
-          <option value="all">Все категории</option>
-          <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
+          <option value="all">{{ 'warehouse.filter.allCategories' | translate }}</option>
+          <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.labelKey | translate }}</option>
         </select>
       </div>
 
@@ -84,7 +84,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
           </svg>
-          Операция
+          {{ 'warehouse.buttons.operation' | translate }}
         </button>
         <button
           (click)="openCreateItemModal()"
@@ -93,7 +93,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
           </svg>
-          Добавить товар
+          {{ 'warehouse.buttons.addItem' | translate }}
         </button>
       </div>
     </div>
@@ -104,62 +104,62 @@
         <table class="w-full">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Товар</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Категория</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Остаток</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Мин. остаток</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Цена</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Поставщик</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Статус</th>
-              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Действия</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.table.item' | translate }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.table.category' | translate }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.table.stock' | translate }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.table.minStock' | translate }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.table.price' | translate }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.table.supplier' | translate }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.table.status' | translate }}</th>
+              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.table.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
             <tr *ngFor="let item of getFilteredItems(items$ | async)" class="hover:bg-gray-50">
               <td class="px-4 py-3 whitespace-nowrap">
-                <div class="font-medium text-gray-900">{{ item.name }}</div>
+                <div class="font-medium text-gray-900">{{ getLocalizedName(item) }}</div>
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                {{ item.category }}
+                {{ getCategoryLabel(item.category) }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <span [class]="'font-bold ' + (isLowStock(item) ? 'text-red-600' : 'text-green-600')">
-                  {{ item.quantity }} {{ item.unit }}
+                  {{ item.quantity }} {{ getUnitLabel(item.unit) }}
                 </span>
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                {{ item.minQuantity }} {{ item.unit }}
+                {{ item.minQuantity }} {{ getUnitLabel(item.unit) }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                {{ formatPrice(item.price) }}/{{ item.unit }}
+                {{ formatPrice(item.price) }}/{{ getUnitLabel(item.unit) }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                {{ item.supplier || '-' }}
+                {{ getSupplierName(item) }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <span [class]="'px-2 py-1 rounded-full text-xs font-medium ' + getStockColor(item)">
-                  {{ getStockStatus(item) }}
+                  {{ getStockStatusKey(item) | translate }}
                 </span>
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-center">
                 <button
                   (click)="openOperationModal(item)"
                   class="text-blue-600 hover:text-blue-800 mx-1"
-                  title="Операция"
+                  [title]="'warehouse.actions.operation' | translate"
                 >
                   📋
                 </button>
                 <button
                   (click)="openEditItemModal(item)"
                   class="text-blue-600 hover:text-blue-800 mx-1"
-                  title="Редактировать"
+                  [title]="'warehouse.actions.edit' | translate"
                 >
                   ✏️
                 </button>
                 <button
                   (click)="deleteItem(item)"
                   class="text-red-600 hover:text-red-800 mx-1"
-                  title="Удалить"
+                  [title]="'warehouse.actions.delete' | translate"
                 >
                   🗑️
                 </button>
@@ -173,46 +173,50 @@
 
   <!-- Вкладка: История операций -->
   <div *ngIf="activeTab === 'operations'">
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Дата</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Товар</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Тип</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Количество</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Заметки</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Пользователь</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr *ngFor="let operation of operations$ | async" class="hover:bg-gray-50">
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                {{ formatDate(operation.date) }}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">
-                {{ operation.itemName }}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap">
-                <span [class]="'px-2 py-1 rounded-full text-xs font-medium ' + getOperationColor(operation.type)">
-                  {{ operation.type }}
-                </span>
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
-                {{ operation.quantity }} {{ operation.unit }}
-              </td>
-              <td class="px-4 py-3 text-sm text-gray-600">
-                {{ operation.notes || '-' }}
-              </td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                {{ operation.userName || '-' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <ng-container *ngIf="(operations$ | async) as operations">
+      <ng-container *ngIf="(items$ | async) as items">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.operations.table.date' | translate }}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.operations.table.item' | translate }}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.operations.table.type' | translate }}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.operations.table.quantity' | translate }}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.operations.table.notes' | translate }}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ 'warehouse.operations.table.user' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr *ngFor="let operation of operations" class="hover:bg-gray-50">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                    {{ formatDate(operation.date) }}
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">
+                    {{ getOperationItemName(operation, items) }}
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <span [class]="'px-2 py-1 rounded-full text-xs font-medium ' + getOperationColor(operation.type)">
+                      {{ getOperationTypeLabel(operation.type) }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
+                    {{ operation.quantity }} {{ getUnitLabel(operation.unit) }}
+                  </td>
+                  <td class="px-4 py-3 text-sm text-gray-600">
+                    {{ getLocalizedNotes(operation) }}
+                  </td>
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                    {{ operation.userName || '-' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
   </div>
 
   <!-- Модальное окно: Товар -->
@@ -239,7 +243,7 @@
       <form (ngSubmit)="saveItem()" class="p-6 space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            Название <span class="text-red-500">*</span>
+            {{ 'warehouse.modal.item.name' | translate }} <span class="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -247,37 +251,37 @@
             name="name"
             required
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            placeholder="Например: Говядина рибай"
+            [placeholder]="'warehouse.modal.item.name.placeholder' | translate"
           />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Категория</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.item.category' | translate }}</label>
             <select
               [(ngModel)]="itemForm.category"
               name="category"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
+              <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.labelKey | translate }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Единица измерения</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.item.unit' | translate }}</label>
             <select
               [(ngModel)]="itemForm.unit"
               name="unit"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              <option *ngFor="let unit of units" [value]="unit.value">{{ unit.label }}</option>
+              <option *ngFor="let unit of units" [value]="unit.value">{{ unit.labelKey | translate }}</option>
             </select>
           </div>
         </div>
 
         <div class="grid grid-cols-3 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Количество</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.item.quantity' | translate }}</label>
             <input
               type="number"
               [(ngModel)]="itemForm.quantity"
@@ -289,7 +293,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Мин. остаток</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.item.minQuantity' | translate }}</label>
             <input
               type="number"
               [(ngModel)]="itemForm.minQuantity"
@@ -301,7 +305,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Цена (€)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.item.price' | translate }}</label>
             <input
               type="number"
               [(ngModel)]="itemForm.price"
@@ -314,13 +318,13 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Поставщик</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.item.supplier' | translate }}</label>
           <input
             type="text"
             [(ngModel)]="itemForm.supplier"
             name="supplier"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            placeholder="Название компании"
+            [placeholder]="'warehouse.modal.item.supplier.placeholder' | translate"
           />
         </div>
 
@@ -330,13 +334,13 @@
             (click)="closeItemModal()"
             class="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition font-medium"
           >
-            Отмена
+            {{ 'warehouse.modal.cancel' | translate }}
           </button>
           <button
             type="submit"
             class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium"
           >
-            {{ editingItem ? 'Сохранить' : 'Добавить' }}
+            {{ editingItem ? ('warehouse.modal.save' | translate) : ('warehouse.modal.add' | translate) }}
           </button>
         </div>
       </form>
@@ -354,7 +358,7 @@
       (click)="$event.stopPropagation()"
     >
       <div class="border-b px-6 py-4 flex justify-between items-center">
-        <h2 class="text-2xl font-bold text-gray-800">Операция</h2>
+        <h2 class="text-2xl font-bold text-gray-800">{{ 'warehouse.modal.operation.title' | translate }}</h2>
         <button (click)="closeOperationModal()" class="text-gray-400 hover:text-gray-600">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -365,7 +369,7 @@
       <form (ngSubmit)="saveOperation()" class="p-6 space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            Товар <span class="text-red-500">*</span>
+            {{ 'warehouse.modal.operation.item' | translate }} <span class="text-red-500">*</span>
           </label>
           <select
             [(ngModel)]="operationForm.itemId"
@@ -373,28 +377,28 @@
             required
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           >
-            <option [value]="0">Выберите товар</option>
+            <option [value]="0">{{ 'warehouse.modal.operation.selectItem' | translate }}</option>
             <option *ngFor="let item of items$ | async" [value]="item.id">
-              {{ item.name }} ({{ item.quantity }} {{ item.unit }})
+              {{ item.name }} ({{ item.quantity }} {{ getUnitLabel(item.unit) }})
             </option>
           </select>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Тип операции</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.operation.type' | translate }}</label>
           <select
             [(ngModel)]="operationForm.type"
             name="type"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           >
             <option *ngFor="let type of operationTypes" [value]="type.value">
-              {{ type.label }}
+              {{ type.labelKey | translate }}
             </option>
           </select>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Количество</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.operation.quantity' | translate }}</label>
           <input
             type="number"
             [(ngModel)]="operationForm.quantity"
@@ -407,13 +411,13 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Заметки</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'warehouse.modal.operation.notes' | translate }}</label>
           <textarea
             [(ngModel)]="operationForm.notes"
             name="notes"
             rows="2"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-            placeholder="Дополнительная информация..."
+            [placeholder]="'warehouse.modal.operation.notes.placeholder' | translate"
           ></textarea>
         </div>
 
@@ -423,13 +427,13 @@
             (click)="closeOperationModal()"
             class="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition font-medium"
           >
-            Отмена
+            {{ 'warehouse.modal.cancel' | translate }}
           </button>
           <button
             type="submit"
             class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition font-medium"
           >
-            Выполнить
+            {{ 'warehouse.modal.operation.submit' | translate }}
           </button>
         </div>
       </form>

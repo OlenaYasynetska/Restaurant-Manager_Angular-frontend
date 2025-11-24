@@ -1,31 +1,31 @@
 <div class="max-w-7xl mx-auto">
   <!-- Заголовок -->
   <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">Столики</h1>
-    <p class="text-gray-600">Выберите столик для создания или продолжения заказа</p>
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ 'tables.title' | translate }}</h1>
+    <p class="text-gray-600">{{ 'tables.subtitle' | translate }}</p>
   </div>
 
   <!-- Легенда -->
   <div class="flex flex-wrap gap-4 mb-8 p-4 bg-white rounded-lg shadow-sm">
     <div class="flex items-center gap-2">
       <div class="w-4 h-4 rounded border-2 border-green-400 bg-green-50"></div>
-      <span class="text-sm text-gray-700">Свободен</span>
+      <span class="text-sm text-gray-700">{{ 'tables.status.free' | translate }}</span>
     </div>
     <div class="flex items-center gap-2">
       <div class="w-4 h-4 rounded border-2 border-purple-400 bg-purple-100"></div>
-      <span class="text-sm text-gray-700">Забронирован</span>
+      <span class="text-sm text-gray-700">{{ 'tables.status.reserved' | translate }}</span>
     </div>
     <div class="flex items-center gap-2">
       <div class="w-4 h-4 rounded border-2 border-blue-400 bg-blue-100"></div>
-      <span class="text-sm text-gray-700">Занят</span>
+      <span class="text-sm text-gray-700">{{ 'tables.status.occupied' | translate }}</span>
     </div>
     <div class="flex items-center gap-2">
       <div class="w-4 h-4 rounded border-2 border-yellow-400 bg-yellow-100"></div>
-      <span class="text-sm text-gray-700">Ожидает оплаты</span>
+      <span class="text-sm text-gray-700">{{ 'tables.status.waitingPayment' | translate }}</span>
     </div>
     <div class="flex items-center gap-2">
       <div class="w-4 h-4 rounded border-2 border-gray-300 bg-gray-100"></div>
-      <span class="text-sm text-gray-700">Закрыт</span>
+      <span class="text-sm text-gray-700">{{ 'tables.status.closed' | translate }}</span>
     </div>
   </div>
 
@@ -43,22 +43,22 @@
 
       <!-- Номер столика -->
       <div class="text-2xl font-bold text-gray-800 mb-1">
-        Стол {{ table.number }}
+        {{ 'tables.tableLabel' | translate }} {{ table.number }}
       </div>
 
       <!-- Количество мест -->
       <div *ngIf="table.seats" class="text-sm text-gray-600 mb-2">
-        <span>👥 {{ table.seats }} мест</span>
+        <span>👥 {{ table.seats }} {{ 'tables.seats' | translate }}</span>
       </div>
 
       <!-- Статус -->
       <div [class]="'text-sm font-medium ' + getStatusColor(table.status)">
-        {{ getStatusText(table.status) }}
+        {{ getStatusTranslationKey(table.status) | translate }}
       </div>
 
       <!-- ID активного заказа -->
       <div *ngIf="table.activeOrderId" class="text-xs text-gray-500 mt-2">
-        Заказ #{{ table.activeOrderId }}
+        {{ 'tables.orderLabel' | translate }} #{{ table.activeOrderId }}
       </div>
 
       <!-- Кнопки действий -->
@@ -66,13 +66,13 @@
         <!-- Для свободных столиков -->
         <div *ngIf="table.status === TableStatus.FREE" class="flex flex-col gap-2">
           <div class="text-xs bg-green-600 text-white px-3 py-1 rounded-full text-center">
-            Создать заказ
+            {{ 'tables.createOrder' | translate }}
           </div>
           <button
             (click)="reserveTable($event, table)"
             class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-full transition"
           >
-            📅 Забронировать
+            📅 {{ 'tables.reserve' | translate }}
           </button>
         </div>
 
@@ -81,7 +81,7 @@
           *ngIf="table.status === TableStatus.RESERVED"
           class="text-xs bg-purple-600 text-white px-3 py-1 rounded-full text-center"
         >
-          Посмотреть бронь
+          {{ 'tables.viewReservation' | translate }}
         </div>
 
         <!-- Для занятых столиков -->
@@ -90,13 +90,13 @@
           class="flex flex-col gap-2"
         >
           <div class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full text-center">
-            Открыть заказ
+            {{ 'tables.openOrder' | translate }}
           </div>
           <button
             (click)="markTableWaitingPayment($event, table)"
             class="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-full transition"
           >
-            💳 Отметить к оплате
+            💳 {{ 'tables.markPayment' | translate }}
           </button>
         </div>
 
@@ -105,7 +105,7 @@
           *ngIf="table.status === TableStatus.WAITING_PAYMENT"
           class="text-xs bg-yellow-600 text-white px-3 py-1 rounded-full text-center"
         >
-          К оплате
+          {{ 'tables.toPay' | translate }}
         </div>
       </div>
     </div>
@@ -117,7 +117,7 @@
     class="text-center py-16 text-gray-500"
   >
     <div class="text-6xl mb-4">🪑</div>
-    <p class="text-lg">Нет доступных столиков</p>
+    <p class="text-lg">{{ 'tables.noTables' | translate }}</p>
   </div>
 </div>
 

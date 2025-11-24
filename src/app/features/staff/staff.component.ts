@@ -419,9 +419,9 @@ export class StaffComponent implements OnInit {
   }
 
   getStaffName(staffId: number, staffList: Staff[] | null): string {
-    if (!staffList) return 'Неизвестно';
+    if (!staffList) return this.languageService.translate('warehouse.unknown');
     const staff = staffList.find(s => s.id === staffId);
-    return staff ? staff.name : 'Неизвестно';
+    return staff ? staff.name : this.languageService.translate('warehouse.unknown');
   }
 
   getStaffRole(staffId: number, staffList: Staff[] | null): StaffRole | null {
@@ -431,7 +431,7 @@ export class StaffComponent implements OnInit {
   }
 
   formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('ru-RU', {
+    return new Date(date).toLocaleDateString(this.getLocale(), {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
@@ -439,7 +439,10 @@ export class StaffComponent implements OnInit {
   }
 
   formatPrice(price: number): string {
-    return `€${price.toLocaleString('ru-RU')}`;
+    return new Intl.NumberFormat(this.getLocale(), {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(price);
   }
 
   private buildWeekDates(offset: number): Date[] {
@@ -471,11 +474,16 @@ export class StaffComponent implements OnInit {
     const start = this.currentWeekDates[0];
     const end = this.currentWeekDates[this.currentWeekDates.length - 1];
     const options = { day: '2-digit', month: 'short' } as const;
-    return `${start.toLocaleDateString('ru-RU', options)} — ${end.toLocaleDateString('ru-RU', options)}`;
+    return `${start.toLocaleDateString(this.getLocale(), options)} — ${end.toLocaleDateString(this.getLocale(), options)}`;
   }
 
   getDayLabel(date: Date): string {
-    return date.toLocaleDateString('ru-RU', { weekday: 'short', day: '2-digit' });
+    const lang = this.languageService.getCurrentLanguage();
+    return date.toLocaleDateString(this.getLocale(), {
+      weekday: 'short',
+      day: '2-digit',
+      ...(lang === 'en' || lang === 'de' ? { month: 'short' } : {})
+    });
   }
 
   getWeekStartDate(): Date | null {
@@ -537,5 +545,17 @@ export class StaffComponent implements OnInit {
       [StaffRole.HOSTESS]: 'bg-pink-100 text-pink-700',
     };
     return colors[role] || 'bg-gray-100 text-gray-700';
+  }
+
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    switch (lang) {
+      case 'de':
+        return 'de-DE';
+      case 'ru':
+        return 'ru-RU';
+      default:
+        return 'en-US';
+    }
   }
 }

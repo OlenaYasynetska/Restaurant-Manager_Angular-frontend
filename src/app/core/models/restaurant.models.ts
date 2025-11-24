@@ -75,6 +75,17 @@ export enum MenuCategory {
   ALCOHOL = 'Алкоголь'
 }
 
+export interface TranslatedText {
+  ru: string;
+  en: string;
+  de: string;
+}
+
+export interface MenuItemTranslations {
+  name: TranslatedText;
+  description?: TranslatedText;
+}
+
 // Позиция меню
 export interface MenuItem {
   id: number;
@@ -86,6 +97,12 @@ export interface MenuItem {
   imageUrl?: string;       // URL реального фото блюда
   available: boolean;      // доступно для заказа
   preparationTime?: number; // время приготовления в минутах
+  translations?: MenuItemTranslations;
+}
+
+export interface WarehouseItemTranslations {
+  name?: TranslatedText;
+  supplier?: TranslatedText;
 }
 
 // Способ оплаты
@@ -173,6 +190,11 @@ export enum OperationType {
 }
 
 // Товар на складе
+export interface WarehouseItemTranslations {
+  name?: TranslatedText;
+  supplier?: TranslatedText;
+}
+
 export interface WarehouseItem {
   id: number;
   name: string;
@@ -183,6 +205,11 @@ export interface WarehouseItem {
   price: number;           // Цена за единицу (€)
   supplier?: string;       // Поставщик
   lastUpdated: Date;
+  translations?: WarehouseItemTranslations;
+}
+
+export interface WarehouseOperationTranslations {
+  notes?: TranslatedText;
 }
 
 // Операция на складе
@@ -197,6 +224,7 @@ export interface WarehouseOperation {
   notes?: string;
   userId?: number;         // Кто провел операцию
   userName?: string;
+  translations?: WarehouseOperationTranslations;
 }
 
 // Ингредиент в рецепте (технологической карте)

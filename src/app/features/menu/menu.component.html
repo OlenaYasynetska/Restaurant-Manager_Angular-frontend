@@ -9,16 +9,16 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
-      Назад к заказу
+      {{ 'menu.backToOrder' | translate }}
     </button>
-    <h1 class="text-3xl font-bold text-gray-800 mb-4">Меню</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ 'menu.title' | translate }}</h1>
     
     <!-- Поиск -->
     <div class="mb-4">
       <input
         type="text"
         [(ngModel)]="searchQuery"
-        placeholder="Поиск блюд..."
+        [placeholder]="'menu.search.placeholder' | translate"
         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
       />
     </div>
@@ -35,7 +35,7 @@
             ? 'bg-blue-600 text-white' 
             : 'bg-white text-gray-700 hover:bg-gray-100')"
       >
-        {{ category.label }}
+        {{ category.labelKey | translate }}
       </button>
     </div>
   </div>
@@ -67,14 +67,14 @@
       <!-- Информация о блюде -->
       <div class="p-4">
         <!-- Категория -->
-        <div class="text-xs text-gray-500 mb-1">{{ item.category }}</div>
+        <div class="text-xs text-gray-500 mb-1">{{ getCategoryTranslation(item.category) | translate }}</div>
         
         <!-- Название -->
-        <h3 class="font-semibold text-gray-800 mb-2">{{ item.name }}</h3>
+        <h3 class="font-semibold text-gray-800 mb-2">{{ getItemName(item) }}</h3>
         
         <!-- Описание (если есть) -->
-        <p *ngIf="item.description" class="text-sm text-gray-600 mb-3 line-clamp-2">
-          {{ item.description }}
+        <p *ngIf="getItemDescription(item)" class="text-sm text-gray-600 mb-3 line-clamp-2">
+          {{ getItemDescription(item) }}
         </p>
         
         <!-- Время приготовления -->
@@ -82,7 +82,7 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {{ item.preparationTime }} мин
+          {{ item.preparationTime }} {{ 'menu.preparation.minutes' | translate }}
         </div>
         
         <!-- Цена и кнопки -->
@@ -99,7 +99,7 @@
                 [disabled]="!item.available"
                 class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg transition font-medium text-sm"
               >
-                Добавить
+                {{ 'menu.addToCart' | translate }}
               </button>
             </div>
           </div>
@@ -127,7 +127,7 @@
         
         <!-- Недоступно -->
         <div *ngIf="!item.available" class="mt-2 text-xs text-red-600">
-          Временно недоступно
+          {{ 'menu.unavailable' | translate }}
         </div>
       </div>
     </div>
@@ -139,7 +139,7 @@
     class="text-center py-16 text-gray-500"
   >
     <div class="text-6xl mb-4">🔍</div>
-    <p class="text-lg">Ничего не найдено</p>
+    <p class="text-lg">{{ 'menu.noResults' | translate }}</p>
   </div>
 
   <!-- Плавающая панель с корзиной - только если есть orderId -->
@@ -149,7 +149,7 @@
   >
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
       <div class="flex-1">
-        <div class="text-sm text-gray-600">Выбрано позиций: {{ getTotalCartItems() }}</div>
+        <div class="text-sm text-gray-600">{{ 'menu.selectedCount' | translate }} {{ getTotalCartItems() }}</div>
         <div class="text-xl font-bold text-gray-900">{{ formatPrice(getCartTotal()) }}</div>
       </div>
       
@@ -158,13 +158,13 @@
           (click)="cancel()"
           class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition font-medium"
         >
-          Отменить
+          {{ 'menu.cancel' | translate }}
         </button>
         <button
           (click)="confirmSelection()"
           class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium"
         >
-          Добавить в заказ
+          {{ 'menu.addToOrder' | translate }}
         </button>
       </div>
     </div>

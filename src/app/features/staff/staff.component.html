@@ -121,18 +121,18 @@
       <button
         (click)="changeWeek(-1)"
         class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition"
-        title="Предыдущая неделя"
+        [title]="'staff.schedule.prevWeek' | translate"
       >
         ←
       </button>
       <button
         (click)="changeWeek(1)"
         class="px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition"
-        title="Следующая неделя"
+        [title]="'staff.schedule.nextWeek' | translate"
       >
         →
       </button>
-      <div class="text-sm text-gray-600">Листайте стрелки, чтобы выбрать другую неделю</div>
+      <div class="text-sm text-gray-600">{{ 'staff.schedule.hint' | translate }}</div>
     </div>
 
     <div class="flex gap-4 flex-wrap mb-4" *ngIf="staff$ | async as staffList">

@@ -7,11 +7,13 @@ import { OrderService } from '../../core/services/order.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ReservationService } from '../../core/services/reservation.service';
 import { Table } from '../../core/models/restaurant.models';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-order-create',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './order-create.component.html',
 })
 export class OrderCreateComponent implements OnInit {
@@ -25,7 +27,8 @@ export class OrderCreateComponent implements OnInit {
     private tableService: TableService,
     private orderService: OrderService,
     public authService: AuthService,
-    private reservationService: ReservationService
+    private reservationService: ReservationService,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -110,6 +113,12 @@ export class OrderCreateComponent implements OnInit {
   // Отмена
   cancel(): void {
     this.router.navigate(['/tables']);
+  }
+
+  getGuestLabel(): string {
+    return this.guests === 1
+      ? this.languageService.translate('orderCreate.guests.one')
+      : this.languageService.translate('orderCreate.guests.many');
   }
 }
 

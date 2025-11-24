@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { WarehouseService } from '../../core/services/warehouse.service';
-import { WarehouseItem, WarehouseOperation, WarehouseCategory, Unit, OperationType } from '../../core/models/restaurant.models';
+import { WarehouseItem, WarehouseOperation, WarehouseCategory, Unit, OperationType, TranslatedText } from '../../core/models/restaurant.models';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-warehouse',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './warehouse.component.html',
 })
 export class WarehouseComponent implements OnInit {
@@ -46,34 +48,37 @@ export class WarehouseComponent implements OnInit {
   
   // Справочники
   categories = [
-    { value: WarehouseCategory.MEAT, label: 'Мясо' },
-    { value: WarehouseCategory.FISH, label: 'Рыба' },
-    { value: WarehouseCategory.VEGETABLES, label: 'Овощи' },
-    { value: WarehouseCategory.FRUITS, label: 'Фрукты' },
-    { value: WarehouseCategory.DAIRY, label: 'Молочные продукты' },
-    { value: WarehouseCategory.CEREALS, label: 'Крупы и макароны' },
-    { value: WarehouseCategory.SPICES, label: 'Специи' },
-    { value: WarehouseCategory.DRINKS, label: 'Напитки' },
-    { value: WarehouseCategory.ALCOHOL, label: 'Алкоголь' },
-    { value: WarehouseCategory.OTHER, label: 'Прочее' }
+    { value: WarehouseCategory.MEAT, labelKey: 'warehouse.category.meat' },
+    { value: WarehouseCategory.FISH, labelKey: 'warehouse.category.fish' },
+    { value: WarehouseCategory.VEGETABLES, labelKey: 'warehouse.category.vegetables' },
+    { value: WarehouseCategory.FRUITS, labelKey: 'warehouse.category.fruits' },
+    { value: WarehouseCategory.DAIRY, labelKey: 'warehouse.category.dairy' },
+    { value: WarehouseCategory.CEREALS, labelKey: 'warehouse.category.cereals' },
+    { value: WarehouseCategory.SPICES, labelKey: 'warehouse.category.spices' },
+    { value: WarehouseCategory.DRINKS, labelKey: 'warehouse.category.drinks' },
+    { value: WarehouseCategory.ALCOHOL, labelKey: 'warehouse.category.alcohol' },
+    { value: WarehouseCategory.OTHER, labelKey: 'warehouse.category.other' }
   ];
   
   units = [
-    { value: Unit.KG, label: 'кг' },
-    { value: Unit.G, label: 'г' },
-    { value: Unit.L, label: 'л' },
-    { value: Unit.ML, label: 'мл' },
-    { value: Unit.PCS, label: 'шт' },
-    { value: Unit.PACK, label: 'уп' }
+    { value: Unit.KG, labelKey: 'warehouse.unit.kg' },
+    { value: Unit.G, labelKey: 'warehouse.unit.g' },
+    { value: Unit.L, labelKey: 'warehouse.unit.l' },
+    { value: Unit.ML, labelKey: 'warehouse.unit.ml' },
+    { value: Unit.PCS, labelKey: 'warehouse.unit.pcs' },
+    { value: Unit.PACK, labelKey: 'warehouse.unit.pack' }
   ];
   
   operationTypes = [
-    { value: OperationType.INCOMING, label: 'Приход' },
-    { value: OperationType.OUTGOING, label: 'Расход' },
-    { value: OperationType.WRITE_OFF, label: 'Списание' }
+    { value: OperationType.INCOMING, labelKey: 'warehouse.operation.incoming' },
+    { value: OperationType.OUTGOING, labelKey: 'warehouse.operation.outgoing' },
+    { value: OperationType.WRITE_OFF, labelKey: 'warehouse.operation.writeoff' }
   ];
 
-  constructor(private warehouseService: WarehouseService) {}
+  constructor(
+    private warehouseService: WarehouseService,
+    private languageService: LanguageService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -122,7 +127,7 @@ export class WarehouseComponent implements OnInit {
 
   saveItem(): void {
     if (!this.itemForm.name.trim()) {
-      alert('Введите название товара');
+      alert(this.t('warehouse.alert.nameRequired'));
       return;
     }
 
@@ -136,7 +141,7 @@ export class WarehouseComponent implements OnInit {
   }
 
   deleteItem(item: WarehouseItem): void {
-    if (confirm(`Удалить товар "${item.name}"?`)) {
+    if (confirm(`${this.t('warehouse.alert.deleteConfirm')} "${item.name}"?`)) {
       this.warehouseService.deleteItem(item.id);
     }
   }
@@ -159,12 +164,12 @@ export class WarehouseComponent implements OnInit {
 
   saveOperation(): void {
     if (this.operationForm.itemId === 0) {
-      alert('Выберите товар');
+      alert(this.t('warehouse.alert.selectItem'));
       return;
     }
 
     if (this.operationForm.quantity <= 0) {
-      alert('Введите количество');
+      alert(this.t('warehouse.alert.enterQuantity'));
       return;
     }
 
@@ -178,11 +183,11 @@ export class WarehouseComponent implements OnInit {
         break;
       case OperationType.OUTGOING:
         success = this.warehouseService.addOutgoing(itemId, quantity, notes);
-        if (!success) alert('Недостаточно товара на складе');
+        if (!success) alert(this.t('warehouse.alert.notEnoughStock'));
         break;
       case OperationType.WRITE_OFF:
         success = this.warehouseService.addWriteOff(itemId, quantity, notes);
-        if (!success) alert('Недостаточно товара на складе');
+        if (!success) alert(this.t('warehouse.alert.notEnoughStock'));
         break;
     }
 
@@ -206,10 +211,10 @@ export class WarehouseComponent implements OnInit {
     return item.quantity <= item.minQuantity;
   }
 
-  getStockStatus(item: WarehouseItem): string {
-    if (item.quantity === 0) return 'Нет в наличии';
-    if (this.isLowStock(item)) return 'Низкий остаток';
-    return 'В наличии';
+  getStockStatusKey(item: WarehouseItem): string {
+    if (item.quantity === 0) return 'warehouse.status.outOfStock';
+    if (this.isLowStock(item)) return 'warehouse.status.lowStock';
+    return 'warehouse.status.inStock';
   }
 
   getStockColor(item: WarehouseItem): string {
@@ -219,11 +224,15 @@ export class WarehouseComponent implements OnInit {
   }
 
   formatPrice(price: number): string {
-    return `€${price.toLocaleString('ru-RU')}`;
+    const locale = this.getLocale();
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(price);
   }
 
   formatDate(date: Date): string {
-    return new Date(date).toLocaleString('ru-RU', {
+    return new Date(date).toLocaleString(this.getLocale(), {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -245,9 +254,64 @@ export class WarehouseComponent implements OnInit {
     }
   }
 
-  getItemName(itemId: number, items: WarehouseItem[] | null): string {
-    if (!items) return '';
-    const item = items.find(i => i.id === itemId);
-    return item ? item.name : 'Неизвестно';
+  getCategoryLabel(category: WarehouseCategory): string {
+    const entry = this.categories.find(cat => cat.value === category);
+    return entry ? this.t(entry.labelKey) : category;
+  }
+
+  getUnitLabel(unit: Unit): string {
+    const entry = this.units.find(u => u.value === unit);
+    return entry ? this.t(entry.labelKey) : unit;
+  }
+
+  getOperationTypeLabel(type: OperationType): string {
+    const entry = this.operationTypes.find(op => op.value === type);
+    return entry ? this.t(entry.labelKey) : type;
+  }
+
+  getLocalizedName(item: WarehouseItem): string {
+    return this.translateField(item.translations?.name, item.name);
+  }
+
+  getSupplierName(item: WarehouseItem): string {
+    const fallback = item.supplier || '';
+    if (!fallback) {
+      return '-';
+    }
+    return this.translateField(item.translations?.supplier, fallback);
+  }
+
+  getOperationItemName(operation: WarehouseOperation, items: WarehouseItem[] | null): string {
+    const item = items?.find(i => i.id === operation.itemId);
+    return item ? this.getLocalizedName(item) : this.translateField(undefined, operation.itemName);
+  }
+
+  getLocalizedNotes(operation: WarehouseOperation): string {
+    const fallback = operation.notes || '-';
+    return this.translateField(operation.translations?.notes, fallback);
+  }
+
+  private t(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    switch (lang) {
+      case 'de':
+        return 'de-DE';
+      case 'ru':
+        return 'ru-RU';
+      default:
+        return 'en-US';
+    }
+  }
+
+  private translateField(text?: TranslatedText, fallback: string = ''): string {
+    if (!text) {
+      return fallback;
+    }
+    const lang = this.languageService.getCurrentLanguage();
+    return text[lang] || fallback;
   }
 }

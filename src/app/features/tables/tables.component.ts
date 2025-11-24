@@ -6,11 +6,13 @@ import { OrderService } from '../../core/services/order.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ReservationService } from '../../core/services/reservation.service';
 import { Table, TableStatus, OrderStatus } from '../../core/models/restaurant.models';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-tables',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './tables.component.html',
 })
 export class TablesComponent implements OnInit {
@@ -23,7 +25,8 @@ export class TablesComponent implements OnInit {
     private orderService: OrderService,
     private authService: AuthService,
     private reservationService: ReservationService,
-    private router: Router
+    private router: Router,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit(): void {}
@@ -48,19 +51,19 @@ export class TablesComponent implements OnInit {
     }
   }
 
-  // Получить текст статуса
-  getStatusText(status: TableStatus): string {
+  // Получить ключ перевода для статуса
+  getStatusTranslationKey(status: TableStatus): string {
     switch (status) {
       case TableStatus.FREE:
-        return 'Свободен';
+        return 'tables.status.free';
       case TableStatus.RESERVED:
-        return 'Забронирован';
+        return 'tables.status.reserved';
       case TableStatus.OCCUPIED:
-        return 'Занят';
+        return 'tables.status.occupied';
       case TableStatus.WAITING_PAYMENT:
-        return 'Ожидает оплаты';
+        return 'tables.status.waitingPayment';
       case TableStatus.CLOSED:
-        return 'Закрыт';
+        return 'tables.status.closed';
       default:
         return '';
     }
@@ -147,16 +150,16 @@ export class TablesComponent implements OnInit {
     const reservation = this.reservationService.getReservationByTableId(table.id);
     
     if (reservation) {
-      const time = new Date(reservation.reservationTime).toLocaleString('ru-RU', {
+      const time = new Date(reservation.reservationTime).toLocaleString(this.getLocale(), {
         day: 'numeric',
         month: 'long',
         hour: '2-digit',
         minute: '2-digit'
       });
       
-      const message = `Бронирование: ${reservation.guestName}\nТелефон: ${reservation.guestPhone}\nГостей: ${reservation.guestCount}\nВремя: ${time}${reservation.notes ? '\nЗаметки: ' + reservation.notes : ''}`;
+      const message = `${this.t('reservation.info.title')}: ${reservation.guestName}\n${this.t('reservation.info.phone')}: ${reservation.guestPhone}\n${this.t('reservation.info.guests')}: ${reservation.guestCount}\n${this.t('reservation.info.time')}: ${time}${reservation.notes ? '\n' + this.t('reservation.info.notes') + ': ' + reservation.notes : ''}`;
       
-      const action = confirm(message + '\n\n[OK] - Создать заказ | [Отмена] - Закрыть');
+      const action = confirm(`${message}\n\n${this.t('reservation.info.confirm')}`);
       
       if (action) {
         // Создаем заказ для этого столика
@@ -171,7 +174,7 @@ export class TablesComponent implements OnInit {
         this.reservationService.cancelReservation(reservation.id);
       }
     } else {
-      alert('Информация о бронировании не найдена');
+      alert(this.t('reservation.info.error'));
     }
   }
 
@@ -179,16 +182,27 @@ export class TablesComponent implements OnInit {
     event.stopPropagation();
 
     if (!table.activeOrderId) {
-      alert('Для этого столика нет активного заказа.');
+      alert(this.t('tables.waitingPayment.noOrder'));
       return;
     }
 
-    if (!confirm('Отметить столик как "к оплате"? Пока гость не оплатит, карточка останется жёлтой.')) {
+    if (!confirm(this.t('tables.waitingPayment.confirm'))) {
       return;
     }
 
     this.orderService.updateOrderStatus(table.activeOrderId, OrderStatus.WAITING_PAYMENT);
     this.tableService.setWaitingPayment(table.id);
+  }
+
+  private t(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    if (lang === 'ru') return 'ru-RU';
+    if (lang === 'de') return 'de-DE';
+    return 'en-US';
   }
 }
 

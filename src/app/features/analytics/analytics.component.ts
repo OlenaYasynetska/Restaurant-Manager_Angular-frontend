@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { LanguageService } from '../../core/services/language.service';
 
 interface DayStats {
   date: string;
@@ -27,7 +29,7 @@ interface WaiterStats {
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './analytics.component.html',
 })
 export class AnalyticsComponent {
@@ -65,6 +67,8 @@ export class AnalyticsComponent {
     { name: 'Козлова Анна', orders: 68, revenue: 141440, avgCheck: 2080, rating: 4.6 },
   ];
 
+  constructor(private languageService: LanguageService) {}
+
   // Общая статистика за период
   get totalVisitors(): number {
     return this.dailyStats.reduce((sum, day) => sum + day.visitors, 0);
@@ -99,7 +103,10 @@ export class AnalyticsComponent {
 
   // Форматирование цены
   formatPrice(price: number): string {
-    return `€${price.toLocaleString('ru-RU')}`;
+    return new Intl.NumberFormat(this.getLocale(), {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(price);
   }
 
   // Получить массив посетителей
@@ -166,6 +173,30 @@ export class AnalyticsComponent {
   // Получить Y координату для столбца среднего чека
   getAvgCheckY(avgCheck: number): number {
     return 250 - (avgCheck / this.getMaxValue(this.avgCheckData) * 200);
+  }
+
+  getDishCategoryLabel(category: string): string {
+    const map: Record<string, string> = {
+      'Основные блюда': 'menu.category.main',
+      'Паста': 'menu.category.pasta',
+      'Салаты': 'menu.category.salads',
+      'Супы': 'menu.category.soups',
+      'Десерты': 'menu.category.desserts'
+    };
+    const key = map[category];
+    return key ? this.languageService.translate(key) : category;
+  }
+
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    switch (lang) {
+      case 'de':
+        return 'de-DE';
+      case 'ru':
+        return 'ru-RU';
+      default:
+        return 'en-US';
+    }
   }
 }
 

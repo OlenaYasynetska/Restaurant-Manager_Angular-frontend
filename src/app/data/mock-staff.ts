@@ -3,7 +3,7 @@ import { Staff, Shift, StaffRole } from '../core/models/restaurant.models';
 export const mockStaff: Staff[] = [
   {
     id: 1,
-    name: 'Иванов Иван',
+    name: 'Ivanov Ivan',
     role: StaffRole.WAITER,
     phone: '+43 662 123-45-67',
     email: 'ivanov@restaurant.com',
@@ -13,7 +13,7 @@ export const mockStaff: Staff[] = [
   },
   {
     id: 2,
-    name: 'Петрова Мария',
+    name: 'Petrova Maria',
     role: StaffRole.WAITER,
     phone: '+43 662 234-56-78',
     email: 'petrova@restaurant.com',
@@ -23,7 +23,7 @@ export const mockStaff: Staff[] = [
   },
   {
     id: 3,
-    name: 'Сидоров Петр',
+    name: 'Sidorov Petr',
     role: StaffRole.COOK,
     phone: '+43 662 345-67-89',
     email: 'sidorov@restaurant.com',
@@ -33,7 +33,7 @@ export const mockStaff: Staff[] = [
   },
   {
     id: 4,
-    name: 'Козлова Анна',
+    name: 'Kozlova Anna',
     role: StaffRole.BARTENDER,
     phone: '+43 662 456-78-90',
     email: 'kozlova@restaurant.com',
@@ -43,7 +43,7 @@ export const mockStaff: Staff[] = [
   },
   {
     id: 5,
-    name: 'Смирнов Алексей',
+    name: 'Smirnov Alexey',
     role: StaffRole.MANAGER,
     phone: '+43 662 567-89-01',
     email: 'smirnov@restaurant.com',

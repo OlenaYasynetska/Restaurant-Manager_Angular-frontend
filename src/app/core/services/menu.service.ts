@@ -52,7 +52,8 @@ export class MenuService {
       preparationTime: data.preparationTime || 15,
       description: data.description || '',
       image: data.image || '🍽️',
-      imageUrl: data.imageUrl || undefined
+      imageUrl: data.imageUrl || undefined,
+      translations: data.translations
     };
 
     const currentItems = this.menuItemsSubject.value;
@@ -72,6 +73,7 @@ export class MenuService {
       currentItems[index] = {
         ...currentItems[index],
         ...data,
+        translations: data.translations ?? currentItems[index].translations,
         id // Сохраняем оригинальный ID
       };
       const updatedItems = [...currentItems];

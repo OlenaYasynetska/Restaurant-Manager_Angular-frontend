@@ -6,11 +6,11 @@
     </div>
     
     <h1 class="text-3xl font-bold text-gray-800 mb-2">
-      Создать заказ для стола {{ table.number }}
+      {{ 'orderCreate.title' | translate }} {{ table.number }}
     </h1>
     <p class="text-gray-600">
-      <span *ngIf="table.seats">{{ table.seats }} мест • </span>
-      Столик свободен
+      <span *ngIf="table.seats">{{ table.seats }} {{ 'tables.seats' | translate }} • </span>
+      {{ 'orderCreate.tableFree' | translate }}
     </p>
   </div>
 
@@ -19,7 +19,7 @@
     <!-- Количество гостей -->
     <div class="mb-6">
       <label class="block text-sm font-medium text-gray-700 mb-3">
-        Количество гостей
+        {{ 'orderCreate.guests.label' | translate }}
       </label>
       <div class="flex items-center justify-center gap-3">
         <button
@@ -32,7 +32,7 @@
         
         <div class="w-24 text-center">
           <div class="text-4xl font-bold text-gray-800">{{ guests }}</div>
-          <div class="text-xs text-gray-500 mt-1">{{ guests === 1 ? 'гость' : 'гостей' }}</div>
+          <div class="text-xs text-gray-500 mt-1">{{ getGuestLabel() }}</div>
         </div>
         
         <button
@@ -66,8 +66,8 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <div class="text-sm text-blue-800">
-          <p class="font-medium mb-1">Что дальше?</p>
-          <p>После создания заказа вы сможете добавить блюда из меню или вернуться к списку столиков.</p>
+          <p class="font-medium mb-1">{{ 'orderCreate.info.title' | translate }}</p>
+          <p>{{ 'orderCreate.info.text' | translate }}</p>
         </div>
       </div>
     </div>
@@ -82,7 +82,7 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        Создать заказ
+        {{ 'orderCreate.actions.create' | translate }}
       </button>
 
       <!-- Создать и добавить блюда -->
@@ -93,7 +93,7 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
-        Создать и выбрать блюда
+        {{ 'orderCreate.actions.createAndAdd' | translate }}
       </button>
 
       <!-- Отмена -->
@@ -101,26 +101,29 @@
         (click)="cancel()"
         class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg transition font-medium"
       >
-        Отмена
+        {{ 'orderCreate.actions.cancel' | translate }}
       </button>
     </div>
   </div>
 
   <!-- Дополнительная информация -->
   <div class="text-center text-sm text-gray-500">
-    <p>Официант: {{ (authService.currentUser$ | async)?.username || 'Не указан' }}</p>
+    <p>
+      {{ 'orderCreate.server' | translate }}
+      {{ (authService.currentUser$ | async)?.username || ('orderCreate.serverUnknown' | translate) }}
+    </p>
   </div>
 </div>
 
 <!-- Если столик не найден или занят -->
 <div *ngIf="!(table$ | async)" class="text-center py-16">
   <div class="text-6xl mb-4">❌</div>
-  <h2 class="text-2xl font-semibold text-gray-800 mb-4">Столик не найден</h2>
+  <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ 'orderCreate.notFound' | translate }}</h2>
   <button
     (click)="cancel()"
     class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
   >
-    Вернуться к столикам
+    {{ 'orderCreate.backToTables' | translate }}
   </button>
 </div>
 
