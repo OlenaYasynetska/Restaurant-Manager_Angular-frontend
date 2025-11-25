@@ -10,23 +10,23 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
-          Назад к столикам
+          {{ 'orderDetail.back' | translate }}
         </button>
         <h1 class="text-3xl font-bold text-gray-800">
-          Заказ для стола {{ table.number }}
+          {{ 'orderDetail.title' | translate }} {{ table.number }}
         </h1>
-        <p class="text-gray-600 mt-1">Заказ #{{ order.id }}</p>
+        <p class="text-gray-600 mt-1">{{ 'orderDetail.orderNumber' | translate }} #{{ order.id }}</p>
       </div>
       <div class="text-right">
-        <div class="text-sm text-gray-600">Официант</div>
-        <div class="text-lg font-semibold">{{ order.waiterName || 'Не указан' }}</div>
+        <div class="text-sm text-gray-600">{{ 'orderDetail.waiter' | translate }}</div>
+        <div class="text-lg font-semibold">{{ order.waiterName || ('orderDetail.waiterUnknown' | translate) }}</div>
       </div>
     </div>
 
     <!-- Список позиций заказа -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
       <h2 class="text-xl font-semibold mb-4 flex items-center justify-between">
-        <span>Позиции заказа</span>
+        <span>{{ 'orderDetail.itemsTitle' | translate }}</span>
         <button
           (click)="addItems()"
           class="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition flex items-center gap-2"
@@ -34,19 +34,19 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          Добавить блюдо
+          {{ 'orderDetail.addDish' | translate }}
         </button>
       </h2>
 
       <!-- Если заказ пустой -->
       <div *ngIf="order.items.length === 0" class="text-center py-12 text-gray-500">
         <div class="text-6xl mb-4">🍽️</div>
-        <p class="text-lg mb-4">Заказ пустой</p>
+        <p class="text-lg mb-4">{{ 'orderDetail.empty.title' | translate }}</p>
         <button
           (click)="addItems()"
           class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
         >
-          Добавить первое блюдо
+          {{ 'orderDetail.empty.button' | translate }}
         </button>
       </div>
 
@@ -58,7 +58,7 @@
         >
           <!-- Информация о блюде -->
           <div class="flex-1">
-            <div class="font-semibold text-gray-800">{{ item.name }}</div>
+            <div class="font-semibold text-gray-800">{{ getItemName(item) }}</div>
             <div class="text-sm text-gray-600">{{ formatPrice(item.price) }} × {{ item.quantity }}</div>
             <div *ngIf="item.notes" class="text-xs text-gray-500 mt-1 italic">
               💬 {{ item.notes }}
@@ -92,7 +92,7 @@
             <button
               (click)="removeItem(order.id, item.id)"
               class="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-50 rounded transition"
-              title="Удалить"
+              [title]="'common.delete' | translate"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -106,7 +106,7 @@
     <!-- Итоговая сумма и действия -->
     <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center justify-between mb-6 pb-4 border-b">
-        <span class="text-xl font-semibold text-gray-700">Итого:</span>
+        <span class="text-xl font-semibold text-gray-700">{{ 'orderDetail.total' | translate }}</span>
         <span class="text-3xl font-bold text-gray-900">
           {{ formatPrice(order.totalAmount) }}
         </span>
@@ -115,7 +115,7 @@
       <!-- Статус заказа -->
       <div class="mb-4 p-3 bg-blue-50 rounded-lg">
         <div class="flex items-center justify-between">
-          <span class="text-sm font-medium text-gray-700">Статус:</span>
+          <span class="text-sm font-medium text-gray-700">{{ 'orderDetail.status' | translate }}</span>
           <span class="px-3 py-1 rounded-full text-sm font-semibold" 
                 [ngClass]="getStatusColor(order.status)">
             {{ getStatusText(order.status) }}
@@ -128,7 +128,7 @@
           (click)="addItems()"
           class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition font-medium"
         >
-          Добавить еще
+          {{ 'orderDetail.addMore' | translate }}
         </button>
         
         <!-- Кнопка "Подано" (списывает ингредиенты со склада) -->
@@ -138,7 +138,7 @@
           [disabled]="order.items.length === 0"
           class="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg transition font-medium"
         >
-          🍽️ Подано гостям
+          🍽️ {{ 'orderDetail.markServed' | translate }}
         </button>
         
         <button
@@ -146,7 +146,7 @@
           (click)="closeOrder(order)"
           class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition font-medium"
         >
-          💳 К оплате
+          💳 {{ 'orderDetail.pay' | translate }}
         </button>
       </div>
     </div>
@@ -155,12 +155,12 @@
   <!-- Если заказ не найден -->
   <div *ngIf="!(order$ | async)" class="text-center py-16">
     <div class="text-6xl mb-4">❌</div>
-    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Заказ не найден</h2>
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ 'orderDetail.notFound.title' | translate }}</h2>
     <button
       (click)="goBack()"
       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
     >
-      Вернуться к столикам
+      {{ 'orderDetail.notFound.button' | translate }}
     </button>
   </div>
 </div>

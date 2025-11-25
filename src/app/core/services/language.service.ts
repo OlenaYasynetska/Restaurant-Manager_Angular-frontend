@@ -591,6 +591,273 @@ export class LanguageService {
       en: 'Back to tables',
       de: 'Zurück zu den Tischen'
     },
+    // Order detail
+    'orderDetail.back': {
+      ru: 'Назад к столикам',
+      en: 'Back to tables',
+      de: 'Zurück zu den Tischen'
+    },
+    'orderDetail.title': {
+      ru: 'Заказ для стола',
+      en: 'Order for table',
+      de: 'Bestellung für Tisch'
+    },
+    'orderDetail.orderNumber': {
+      ru: 'Заказ',
+      en: 'Order',
+      de: 'Bestellung'
+    },
+    'orderDetail.waiter': {
+      ru: 'Официант',
+      en: 'Waiter',
+      de: 'Kellner'
+    },
+    'orderDetail.waiterUnknown': {
+      ru: 'Не указан',
+      en: 'Not specified',
+      de: 'Nicht angegeben'
+    },
+    'orderDetail.itemsTitle': {
+      ru: 'Позиции заказа',
+      en: 'Order items',
+      de: 'Bestellpositionen'
+    },
+    'orderDetail.addDish': {
+      ru: 'Добавить блюдо',
+      en: 'Add dish',
+      de: 'Gericht hinzufügen'
+    },
+    'orderDetail.empty.title': {
+      ru: 'Заказ пустой',
+      en: 'Order is empty',
+      de: 'Bestellung ist leer'
+    },
+    'orderDetail.empty.button': {
+      ru: 'Добавить первое блюдо',
+      en: 'Add first dish',
+      de: 'Erstes Gericht hinzufügen'
+    },
+    'orderDetail.total': {
+      ru: 'Итого:',
+      en: 'Total:',
+      de: 'Summe:'
+    },
+    'orderDetail.status': {
+      ru: 'Статус:',
+      en: 'Status:',
+      de: 'Status:'
+    },
+    'orderDetail.addMore': {
+      ru: 'Добавить еще',
+      en: 'Add more',
+      de: 'Mehr hinzufügen'
+    },
+    'orderDetail.markServed': {
+      ru: 'Подано гостям',
+      en: 'Served to guests',
+      de: 'Den Gästen serviert'
+    },
+    'orderDetail.pay': {
+      ru: 'К оплате',
+      en: 'Go to payment',
+      de: 'Zur Zahlung'
+    },
+    'orderDetail.notFound.title': {
+      ru: 'Заказ не найден',
+      en: 'Order not found',
+      de: 'Bestellung nicht gefunden'
+    },
+    'orderDetail.notFound.button': {
+      ru: 'Вернуться к столикам',
+      en: 'Back to tables',
+      de: 'Zurück zu den Tischen'
+    },
+    'orderDetail.confirm.removeItem': {
+      ru: 'Удалить это блюдо из заказа?',
+      en: 'Remove this dish from the order?',
+      de: 'Dieses Gericht aus der Bestellung entfernen?'
+    },
+    'orderDetail.alert.emptyOrder': {
+      ru: 'Заказ пустой! Добавьте блюда.',
+      en: 'Order is empty! Add dishes.',
+      de: 'Bestellung ist leer! Fügen Sie Gerichte hinzu.'
+    },
+    'orderDetail.confirm.serve': {
+      ru: 'Подать блюда гостям?\n\nИнгредиенты будут автоматически списаны со склада согласно технологическим картам.',
+      en: 'Serve dishes to guests?\n\nIngredients will be deducted from the warehouse according to recipe cards.',
+      de: 'Gerichte den Gästen servieren?\n\nZutaten werden gemäß Rezeptkarten automatisch vom Lager abgezogen.'
+    },
+    'orderDetail.confirm.close': {
+      ru: 'Закрыть заказ и перейти к оплате?',
+      en: 'Close the order and go to payment?',
+      de: 'Bestellung schließen und zur Zahlung gehen?'
+    },
+    // Payment
+    'payment.back': {
+      ru: 'Назад к заказу',
+      en: 'Back to order',
+      de: 'Zurück zur Bestellung'
+    },
+    'payment.title': {
+      ru: 'Оплата заказа',
+      en: 'Order payment',
+      de: 'Bestellung bezahlen'
+    },
+    'payment.orderInfo': {
+      ru: 'Стол {{table}}, Заказ #{{order}}',
+      en: 'Table {{table}}, Order #{{order}}',
+      de: 'Tisch {{table}}, Bestellung #{{order}}'
+    },
+    'payment.amountDue': {
+      ru: 'Сумма к оплате',
+      en: 'Amount due',
+      de: 'Zu zahlender Betrag'
+    },
+    'payment.method.title': {
+      ru: 'Способ оплаты',
+      en: 'Payment method',
+      de: 'Zahlungsmethode'
+    },
+    'payment.method.cash': {
+      ru: 'Наличные',
+      en: 'Cash',
+      de: 'Bar'
+    },
+    'payment.method.card': {
+      ru: 'Карта',
+      en: 'Card',
+      de: 'Karte'
+    },
+    'payment.method.qr': {
+      ru: 'QR-код',
+      en: 'QR code',
+      de: 'QR-Code'
+    },
+    'payment.method.mixed': {
+      ru: 'Частичная',
+      en: 'Mixed',
+      de: 'Teilzahlung'
+    },
+    'payment.cash.entered': {
+      ru: 'Внесено наличными',
+      en: 'Cash received',
+      de: 'Bar erhalten'
+    },
+    'payment.cash.noChange': {
+      ru: 'Без сдачи',
+      en: 'Exact amount',
+      de: 'Ohne Wechselgeld'
+    },
+    'payment.cash.change': {
+      ru: 'Сдача',
+      en: 'Change',
+      de: 'Wechselgeld'
+    },
+    'payment.mixed.cash': {
+      ru: 'Наличными',
+      en: 'Cash',
+      de: 'Bar'
+    },
+    'payment.mixed.card': {
+      ru: 'Картой',
+      en: 'Card',
+      de: 'Karte'
+    },
+    'payment.mixed.remaining': {
+      ru: 'Остаток к оплате',
+      en: 'Remaining amount',
+      de: 'Restbetrag'
+    },
+    'payment.info.card': {
+      ru: 'Приложите карту к терминалу',
+      en: 'Tap the card to the terminal',
+      de: 'Karte an das Terminal halten'
+    },
+    'payment.info.qr': {
+      ru: 'Отсканируйте QR-код для оплаты',
+      en: 'Scan the QR code to pay',
+      de: 'QR-Code zum Bezahlen scannen'
+    },
+    'payment.actions.cancel': {
+      ru: 'Отменить',
+      en: 'Cancel',
+      de: 'Abbrechen'
+    },
+    'payment.actions.pay': {
+      ru: 'Провести оплату',
+      en: 'Process payment',
+      de: 'Zahlung durchführen'
+    },
+    'payment.actions.processing': {
+      ru: 'Обработка...',
+      en: 'Processing...',
+      de: 'Verarbeitung...'
+    },
+    'payment.notFound.title': {
+      ru: 'Заказ не найден',
+      en: 'Order not found',
+      de: 'Bestellung nicht gefunden'
+    },
+    'payment.notFound.button': {
+      ru: 'Вернуться к столикам',
+      en: 'Back to tables',
+      de: 'Zurück zu den Tischen'
+    },
+    'payment.alert.cashLess': {
+      ru: 'Внесенная сумма меньше общей суммы заказа',
+      en: 'Cash amount is less than total',
+      de: 'Barbetrag ist geringer als die Gesamtsumme'
+    },
+    'payment.alert.splitLess': {
+      ru: 'Сумма оплаты меньше общей суммы заказа',
+      en: 'Payment is less than total',
+      de: 'Zahlungsbetrag ist geringer als die Gesamtsumme'
+    },
+    'payment.success': {
+      ru: 'Оплата успешно проведена!',
+      en: 'Payment completed successfully!',
+      de: 'Zahlung erfolgreich abgeschlossen!'
+    },
+    'payment.success.change': {
+      ru: 'Сдача: {{change}}',
+      en: 'Change: {{change}}',
+      de: 'Wechselgeld: {{change}}'
+    },
+    'payment.error': {
+      ru: 'Ошибка при обработке оплаты',
+      en: 'Error while processing payment',
+      de: 'Fehler bei der Zahlungsabwicklung'
+    },
+    'payment.cancelConfirm': {
+      ru: 'Отменить оплату и вернуться к заказу?',
+      en: 'Cancel payment and return to order?',
+      de: 'Zahlung abbrechen und zur Bestellung zurückkehren?'
+    },
+    'order.status.new': {
+      ru: 'Новый',
+      en: 'New',
+      de: 'Neu'
+    },
+    'order.status.inProgress': {
+      ru: 'Готовится',
+      en: 'In progress',
+      de: 'In Bearbeitung'
+    },
+    'order.status.served': {
+      ru: 'Подано',
+      en: 'Served',
+      de: 'Serviert'
+    },
+    'order.status.waitingPayment': {
+      ru: 'Ожидает оплаты',
+      en: 'Waiting payment',
+      de: 'Zahlung ausstehend'
+    },
+    'order.status.paid': {
+      ru: 'Оплачен',
+      en: 'Paid',
+      de: 'Bezahlt'
+    },
     // Menu
     'menu.title': {
       ru: 'Меню',
@@ -1635,6 +1902,27 @@ export class LanguageService {
       ru: 'рейтинг',
       en: 'rating',
       de: 'Bewertung'
+    },
+    // Settings
+    'settings.title': {
+      ru: 'Настройки',
+      en: 'Settings',
+      de: 'Einstellungen'
+    },
+    'settings.subtitle': {
+      ru: 'Конфигурация системы',
+      en: 'System configuration',
+      de: 'Systemkonfiguration'
+    },
+    'settings.inProgress.title': {
+      ru: 'Раздел в разработке',
+      en: 'Section in development',
+      de: 'Bereich in Entwicklung'
+    },
+    'settings.inProgress.subtitle': {
+      ru: 'Здесь будут настройки системы',
+      en: 'System settings will appear here',
+      de: 'Hier werden Systemeinstellungen erscheinen'
     }
   };
 

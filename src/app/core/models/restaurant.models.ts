@@ -47,6 +47,7 @@ export interface OrderItem {
   price: number;
   subtotal: number;        // price * quantity
   notes?: string;          // комментарий к блюду
+  translations?: MenuItemTranslations;
 }
 
 // Заказ

@@ -85,6 +85,9 @@ export class OrderService {
           order.items[existingItemIndex].quantity += quantity;
           order.items[existingItemIndex].subtotal = 
             order.items[existingItemIndex].quantity * order.items[existingItemIndex].price;
+          if (menuItem.translations) {
+            order.items[existingItemIndex].translations = menuItem.translations;
+          }
         } else {
           // Добавляем новую позицию
           const newItem: OrderItem = {
@@ -94,7 +97,8 @@ export class OrderService {
             quantity,
             price: menuItem.price,
             subtotal: menuItem.price * quantity,
-            notes
+            notes,
+            translations: menuItem.translations
           };
           order.items.push(newItem);
         }

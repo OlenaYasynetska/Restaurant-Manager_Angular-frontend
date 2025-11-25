@@ -4,12 +4,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, switchMap, of } from 'rxjs';
 import { TableService } from '../../core/services/table.service';
 import { OrderService } from '../../core/services/order.service';
-import { Order, Table, OrderStatus } from '../../core/models/restaurant.models';
+import { Order, Table, OrderStatus, OrderItem, TranslatedText } from '../../core/models/restaurant.models';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './order-detail.component.html',
 })
 export class OrderDetailComponent implements OnInit {
@@ -21,7 +23,8 @@ export class OrderDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private tableService: TableService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -59,7 +62,7 @@ export class OrderDetailComponent implements OnInit {
 
   // Удалить позицию
   removeItem(orderId: number, itemId: number): void {
-    if (confirm('Удалить это блюдо из заказа?')) {
+    if (confirm(this.t('orderDetail.confirm.removeItem'))) {
       this.orderService.removeItemFromOrder(orderId, itemId);
     }
   }
@@ -67,11 +70,11 @@ export class OrderDetailComponent implements OnInit {
   // Отметить как поданное (списание ингредиентов со склада)
   markAsServed(order: Order): void {
     if (order.items.length === 0) {
-      alert('Заказ пустой! Добавьте блюда.');
+      alert(this.t('orderDetail.alert.emptyOrder'));
       return;
     }
 
-    if (confirm('Подать блюда гостям?\n\nИнгредиенты будут автоматически списаны со склада согласно технологическим картам.')) {
+    if (confirm(this.t('orderDetail.confirm.serve'))) {
       this.orderService.updateOrderStatus(order.id, OrderStatus.SERVED);
     }
   }
@@ -79,11 +82,11 @@ export class OrderDetailComponent implements OnInit {
   // Закрыть заказ и перейти к оплате
   closeOrder(order: Order): void {
     if (order.items.length === 0) {
-      alert('Заказ пустой! Добавьте блюда.');
+      alert(this.t('orderDetail.alert.emptyOrder'));
       return;
     }
 
-    if (confirm('Закрыть заказ и перейти к оплате?')) {
+    if (confirm(this.t('orderDetail.confirm.close'))) {
       this.orderService.closeOrder(order.id);
       this.tableService.setWaitingPayment(this.tableId);
       this.router.navigate(['/payment', order.id]);
@@ -99,15 +102,15 @@ export class OrderDetailComponent implements OnInit {
   getStatusText(status: OrderStatus): string {
     switch (status) {
       case OrderStatus.NEW:
-        return 'Новый';
+        return this.t('order.status.new');
       case OrderStatus.IN_PROGRESS:
-        return 'Готовится';
+        return this.t('order.status.inProgress');
       case OrderStatus.SERVED:
-        return 'Подано';
+        return this.t('order.status.served');
       case OrderStatus.WAITING_PAYMENT:
-        return 'Ожидает оплаты';
+        return this.t('order.status.waitingPayment');
       case OrderStatus.PAID:
-        return 'Оплачен';
+        return this.t('order.status.paid');
       default:
         return status;
     }
@@ -133,7 +136,38 @@ export class OrderDetailComponent implements OnInit {
 
   // Форматирование цены
   formatPrice(price: number): string {
-    return `€${price.toLocaleString('ru-RU')}`;
+    return new Intl.NumberFormat(this.getLocale(), {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(price);
+  }
+
+  getItemName(item: OrderItem): string {
+    return this.translateDynamic(item.translations?.name, item.name);
+  }
+
+  private t(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    switch (lang) {
+      case 'de':
+        return 'de-DE';
+      case 'ru':
+        return 'ru-RU';
+      default:
+        return 'en-US';
+    }
+  }
+
+  private translateDynamic(text?: TranslatedText, fallback: string = ''): string {
+    if (!text) {
+      return fallback;
+    }
+    const lang = this.languageService.getCurrentLanguage();
+    return text[lang] || fallback;
   }
 }
 

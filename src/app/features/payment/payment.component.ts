@@ -7,11 +7,13 @@ import { OrderService } from '../../core/services/order.service';
 import { PaymentService } from '../../core/services/payment.service';
 import { TableService } from '../../core/services/table.service';
 import { Order, PaymentMethod } from '../../core/models/restaurant.models';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-payment',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './payment.component.html',
 })
 export class PaymentComponent implements OnInit {
@@ -36,7 +38,8 @@ export class PaymentComponent implements OnInit {
     private router: Router,
     private orderService: OrderService,
     private paymentService: PaymentService,
-    private tableService: TableService
+    private tableService: TableService,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -94,7 +97,7 @@ export class PaymentComponent implements OnInit {
     switch (this.selectedMethod) {
       case PaymentMethod.CASH:
         if (this.cashReceived < order.totalAmount) {
-          alert('Внесенная сумма меньше общей суммы заказа');
+          alert(this.t('payment.alert.cashLess'));
           return;
         }
         cashAmt = this.cashReceived;
@@ -102,7 +105,7 @@ export class PaymentComponent implements OnInit {
       
       case PaymentMethod.MIXED:
         if (this.cashAmount + this.cardAmount < order.totalAmount) {
-          alert('Сумма оплаты меньше общей суммы заказа');
+          alert(this.t('payment.alert.splitLess'));
           return;
         }
         cashAmt = this.cashAmount;
@@ -133,11 +136,11 @@ export class PaymentComponent implements OnInit {
         this.tableService.closeTable(order.tableId);
         
         // Показываем успех и возвращаемся к столикам
-        alert(`Оплата успешно проведена!${payment.change ? `\nСдача: ₽${payment.change}` : ''}`);
+        alert(`${this.t('payment.success')}${payment.change ? `\n${this.formatChangeLabel(payment.change)}` : ''}`);
         this.router.navigate(['/tables']);
       },
       error: (error) => {
-        alert('Ошибка при обработке оплаты');
+        alert(this.t('payment.error'));
         this.isProcessing = false;
       }
     });
@@ -145,13 +148,23 @@ export class PaymentComponent implements OnInit {
 
   // Отменить оплату
   cancel(): void {
-    if (confirm('Отменить оплату и вернуться к заказу?')) {
+    if (confirm(this.t('payment.cancelConfirm'))) {
       this.order$.subscribe(order => {
         if (order) {
           this.router.navigate(['/orders', order.tableId]);
         }
       });
     }
+  }
+
+  formatOrderInfo(order: Order): string {
+    return this.t('payment.orderInfo')
+      .replace('{{table}}', order.tableNumber)
+      .replace('{{order}}', order.id.toString());
+  }
+
+  formatChangeLabel(change: number): string {
+    return this.t('payment.success.change').replace('{{change}}', this.formatPrice(change));
   }
 
   // Вычислить остаток к оплате (для частичной оплаты)
@@ -164,7 +177,26 @@ export class PaymentComponent implements OnInit {
 
   // Форматирование цены
   formatPrice(price: number): string {
-    return `€${price.toLocaleString('ru-RU')}`;
+    return new Intl.NumberFormat(this.getLocale(), {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(price);
+  }
+
+  private t(key: string): string {
+    return this.languageService.translate(key);
+  }
+
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    switch (lang) {
+      case 'de':
+        return 'de-DE';
+      case 'ru':
+        return 'ru-RU';
+      default:
+        return 'en-US';
+    }
   }
 }
 
